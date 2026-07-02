@@ -2,7 +2,7 @@
 
 # 🌿 Gigi's Rice
 
-A modern, minimal and smooth **Niri + Noctalia** desktop configuration for **Arch Linux**.
+A modern, minimal and smooth **Niri + Noctalia** desktop rice for **Arch Linux**.
 
 <img src="screenshots/Desktop.png" width="100%">
 
@@ -124,7 +124,7 @@ The wallpapers featured in the showcase are included in the **wallpapers** folde
 
 For my complete wallpaper collection, visit:
 
-➡️ **https://github.com/deadduck-09/YOUR-WALLPAPER-REPO**
+➡️ **https://github.com/deadduck-09/FireWalls.git**
 
 ---
 
