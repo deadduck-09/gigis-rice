@@ -1,0 +1,23 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Python cache
+__pycache__/
+
+# Environment files
+.env
+.env.*
+
+# Cache
+.cache/
