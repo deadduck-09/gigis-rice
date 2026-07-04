@@ -278,6 +278,15 @@ window-rule {
   open-maximized true
 }
 
+//==========//
+// Gestures //
+//==========//
+gestures {
+  hot-corners {
+    off
+  }
+}
+
 //=========// 
 // KeyBinds// 
 //=========// 
