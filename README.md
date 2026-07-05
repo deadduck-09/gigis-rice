@@ -10,6 +10,7 @@ A modern, minimal and smooth **Niri + Noctalia** desktop rice for **Arch Linux**
 ![Wayland](https://img.shields.io/badge/Wayland-Niri-00BFFF)
 ![License](https://img.shields.io/github/license/deadduck-09/gigis-rice)
 ![Stars](https://img.shields.io/github/stars/deadduck-09/gigis-rice?style=social)
+![Installer](https://img.shields.io/badge/Installer-Included-4CAF50)
 
 </div>
 
@@ -28,6 +29,19 @@ The goal of this setup is to create a desktop that feels:
 - ❤️ Comfortable for Daily Use
 
 Every configuration included here is the one I personally use.
+
+---
+
+# ⚠️ Important
+
+> [!IMPORTANT]
+> **This rice was built and tested with Noctalia v4.7.7.**
+>
+> It may **not work correctly with Noctalia v5 or newer**.
+>
+> This rice depends on **Noctalia plugins**, and plugin support is currently unavailable in the latest v5 release. Because of this, the repository currently targets the latest stable v4 release.
+>
+> Once plugin support is available in v5, this repository will be updated accordingly.
 
 ---
 
@@ -88,9 +102,11 @@ Every configuration included here is the one I personally use.
 # 📂 Repository Structure
 
 ```text
-configs/
-screenshots/
-wallpapers/
+configs/         Application configuration files
+home/            Optional shell configuration
+screenshots/     Preview images
+wallpapers/      Wallpapers used in the rice
+install.sh       Interactive installer
 README.md
 LICENSE
 ```
@@ -99,22 +115,101 @@ LICENSE
 
 # 📦 Installation
 
+## 📋 Prerequisites
+
+Before installing this rice, make sure you have:
+
+- An **Arch Linux** based system
+- **Niri** installed
+- **Noctalia v4.7.7**
+
+Install Noctalia using:
+
+```bash
+paru -S noctalia-shell
+```
+
+---
+
+## 🚀 Automatic Installation (Recommended)
+
 Clone the repository:
 
 ```bash
 git clone https://github.com/deadduck-09/gigis-rice.git
+cd gigis-rice
 ```
 
-Copy the desired configuration into your `~/.config` directory.
+Make the installer executable:
+
+```bash
+chmod +x install.sh
+```
+
+Run the installer:
+
+```bash
+./install.sh
+```
+
+### Installer Features
+
+- 📦 Automatically installs missing packages
+- 🧩 Supports both official repositories and AUR (`yay` / `paru`)
+- 📂 Automatically deploys configuration files
+- 💾 Creates backups of existing configurations
+- 🔄 Restore backups directly from the installer
+- 🧪 Dry Run mode to preview changes
+- 📝 Detailed installation logs for troubleshooting
+
+---
+
+## 🛠 Manual Installation
+
+If you prefer installing everything manually, copy the desired configuration folders into your `~/.config` directory.
 
 Example:
 
 ```bash
 cp -r configs/niri ~/.config/
 cp -r configs/kitty ~/.config/
+cp -r configs/noctalia ~/.config/
 ```
 
-Repeat for the remaining folders as needed.
+Copy the wallpapers:
+
+```bash
+mkdir -p ~/Pictures/Wallpapers
+cp wallpapers/* ~/Pictures/Wallpapers/
+```
+
+Repeat for any remaining configuration folders as needed.
+
+---
+
+## 🐚 Optional Shell Configuration
+
+The repository also includes my personal shell configuration inside the `home/` directory.
+
+Included files:
+
+- `.zshrc`
+- `.p10k.zsh`
+
+These files are **optional** and are **not installed automatically**, allowing you to continue using Bash, Fish, or any other shell you prefer.
+
+If you'd like the same shell setup shown in the screenshots, install:
+
+- Zsh
+- Oh My Zsh
+- Powerlevel10k
+
+Then copy the files:
+
+```bash
+cp home/.zshrc ~/
+cp home/.p10k.zsh ~/
+```
 
 ---
 
@@ -152,8 +247,8 @@ If you like this setup:
 
 - ⭐ Star the repository
 - 🍴 Fork it
-- 🎥 Watch the showcase
-- 💙 Use any part of the configuration you like
+- **[🎥 Watch the showcase](https://youtu.be/RwgF075vDU4?si=8AI1kE-NgDcpLYtx)**
+- 💙 Use any part of the configuration you like.
 
 ---
 
