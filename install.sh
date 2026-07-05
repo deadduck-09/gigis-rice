@@ -149,7 +149,7 @@ render_progress() {
 }
 
 log_step() {
-    ((CURRENT_STEP++))
+    ((++CURRENT_STEP))
     local title="$1"
     local pct=$(( (CURRENT_STEP * 100) / TOTAL_STEPS ))
     
@@ -227,7 +227,7 @@ get_discovered_modules() {
             fi
         done
     fi
-    echo "${dynamic_modules[@]}"
+    printf '%s\n' "${dynamic_modules[@]}"
 }
 
 get_system_aur_helper() {
@@ -287,7 +287,7 @@ phase_system_refresh() {
 phase_inspect_dependencies() {
     log_step "Checking Installed Programs"
     local modules
-    read -r -a modules <<< "$(get_discovered_modules)"
+    mapfile -t modules < <(get_discovered_modules)
     
     local mod
     for mod in "${modules[@]}"; do
@@ -313,7 +313,7 @@ phase_resolve_dependencies() {
     fi
 
     local modules
-    read -r -a modules <<< "$(get_discovered_modules)"
+    mapfile -t modules < <(get_discovered_modules)
     local missing_pkgs=()
     local missing_mods=()
 
@@ -373,12 +373,12 @@ phase_execute_backup() {
     if $DRY_RUN; then log_info "Dry Run: Bypassing filesystem backup creation."; return; fi
 
     local modules
-    read -r -a modules <<< "$(get_discovered_modules)"
+    mapfile -t modules < <(get_discovered_modules)
     local verified_backups=()
 
     local mod
     for mod in "${modules[@]}"; do
-        if [ -d "$HOME/.config/$mod" ] || [ -f "$HOME/.config/$mod" ]; then
+        if [ -e "$HOME/.config/$mod" ]; then
             verified_backups+=("$mod")
         fi
     done
@@ -407,7 +407,7 @@ phase_deploy_configs() {
     log_step "Installing Configurations"
     
     local modules
-    read -r -a modules <<< "$(get_discovered_modules)"
+    mapfile -t modules < <(get_discovered_modules)
     
     if [ ! -d "$HOME/.config" ] && ! $DRY_RUN; then
         mkdir -p "$HOME/.config" 2>>"$LOG_FILE"
@@ -433,7 +433,7 @@ phase_deploy_configs() {
                 
                 rm -rf "$tmp_dest"
                 if cp -r "configs/$mod" "$tmp_dest" 2>>"$LOG_FILE"; then
-                    if [ -d "$final_dest" ] || [ -f "$final_dest" ]; then
+                    if [ -e "$final_dest" ]; then
                         rm -rf "$final_dest" 2>>"$LOG_FILE"
                     fi
                     if mv "$tmp_dest" "$final_dest" 2>>"$LOG_FILE"; then
@@ -473,7 +473,7 @@ phase_deploy_configs() {
                 log_info "Installing auxiliary asset profile: $asset"
                 if ! $DRY_RUN; then
                     mkdir -p "$dest" 2>>"$LOG_FILE"
-                    if cp -a "$asset"/* "$dest/" 2>>"$LOG_FILE"; then
+                    if cp -a "$asset"/. "$dest/" 2>>"$LOG_FILE"; then
                         log_success "Asset deployment complete: $asset -> $dest"
                     else
                         log_fail "Failed to install asset files for: $asset"
