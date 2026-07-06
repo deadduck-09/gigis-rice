@@ -99,20 +99,6 @@ Every configuration included here is the one I personally use.
 
 ---
 
-# 📂 Repository Structure
-
-```text
-configs/         Application configuration files
-home/            Optional shell configuration
-screenshots/     Preview images
-wallpapers/      Wallpapers used in the rice
-install.sh       Interactive installer
-README.md
-LICENSE
-```
-
----
-
 # 📦 Installation
 
 ## 📋 Prerequisites
@@ -213,6 +199,65 @@ cp home/.p10k.zsh ~/
 
 ---
 
+
+# ⌨️ Keybindings
+
+<details>
+<summary><strong>View Default Keybindings</strong></summary>
+
+<br>
+
+### 🖥 Noctalia
+
+| Shortcut | Action |
+|----------|--------|
+| <kbd>Super</kbd> + <kbd>L</kbd> | Lock Screen |
+| <kbd>Super</kbd> + <kbd>,</kbd> | Toggle Wallpaper Picker |
+| <kbd>Super</kbd> + <kbd>.</kbd> | Open Emoji Picker |
+| <kbd>Super</kbd> + <kbd>V</kbd> | Open Clipboard History |
+| <kbd>Super</kbd> + <kbd>D</kbd> | Toggle Control Center |
+| <kbd>Alt</kbd> + <kbd>Space</kbd> | Open Application Launcher |
+
+---
+
+### 🚀 Applications
+
+| Shortcut | Action |
+|----------|--------|
+| <kbd>Super</kbd> + <kbd>T</kbd> | Open Kitty |
+| <kbd>Super</kbd> + <kbd>B</kbd> | Open Browser |
+| <kbd>Super</kbd> + <kbd>E</kbd> | Open File Manager |
+| <kbd>Super</kbd> + <kbd>M</kbd> | Open Music Player |
+| <kbd>Super</kbd> + <kbd>O</kbd> | Open Note Taking app |
+| <kbd>Super</kbd> + <kbd>C</kbd> | Open CodeEditor |
+
+</details>
+
+---
+
+# 📌 Default Applications
+
+<details>
+<summary><strong>View Default Applications</strong></summary>
+
+<br>
+
+These are the applications configured by default in this rice.
+All keybinds will open this if not changed.
+
+| Category | Application |
+|----------|-------------|
+| 🌐 Browser | Helium Browser |
+| 💻 Terminal | Kitty |
+| 📝 Code Editor | VSCodium |
+| 📖 Notes | Obsidian |
+| 📂 File Manager | Thunar |
+| 🎵 Music | Spotify |
+
+</details>
+
+---
+
 # 🌄 Wallpapers
 
 The wallpapers featured in the showcase are included in the **wallpapers** folder.
@@ -220,6 +265,20 @@ The wallpapers featured in the showcase are included in the **wallpapers** folde
 For my complete wallpaper collection, visit:
 
 ➡️ **https://github.com/deadduck-09/FireWalls.git**
+
+---
+
+# 📂 Repository Structure
+
+```text
+configs/         Application configuration files
+home/            Optional shell configuration
+screenshots/     Preview images
+wallpapers/      Wallpapers used in the rice
+install.sh       Interactive installer
+README.md
+LICENSE
+```
 
 ---
 
