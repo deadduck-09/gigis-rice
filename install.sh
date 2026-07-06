@@ -78,7 +78,7 @@ declare -A PACKAGE_MAP=(
 
 # --- Runtime Analytical State Trackers ---
 CURRENT_STEP=0
-TOTAL_STEPS=8  # Dynamically incremented or decremented based on runtime operational mode
+TOTAL_STEPS=9  # Incremented to 9 to account for the new Shell Configuration Phase
 
 INSTALLED_CONFIGS=()
 SKIPPED_CONFIGS=()
@@ -486,6 +486,192 @@ phase_deploy_configs() {
     done
 }
 
+# ==============================================================================
+# NEW MODULE: Gigi's Shell Configuration Pipeline
+# ==============================================================================
+
+phase_install_shell_config() {
+    log_step "Gigi's Shell Configuration"
+    
+    read -rp "  Would you like to install Gigi's Shell Configuration? [Y/n]: " choice
+    choice=${choice:-Y}
+    if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+        log_info "Gigi's Shell Configuration skipped by user choice."
+        return
+    fi
+
+    if $DRY_RUN; then
+        log_info "Dry Run: Skipping shell component deployments."
+        return
+    fi
+
+    # 1. Core Base Tooling Validation
+    log_info "Verifying prerequisite package binaries (zsh, git, curl)..."
+    local shell_pkgs=("zsh" "git" "curl")
+    local missing_shell_pkgs=()
+    local pkg
+
+    for pkg in "${shell_pkgs[@]}"; do
+        if ! command -v "$pkg" &>/dev/null; then
+            missing_shell_pkgs+=("$pkg")
+        fi
+    done
+
+    if [ ${#missing_shell_pkgs[@]} -gt 0 ]; then
+        log_info "Missing shell dependencies: ${missing_shell_pkgs[*]}"
+        if ! $HAS_INTERNET; then
+            log_fail "Network access unavailable. Cannot install missing required shell packages."
+            exit 1
+        fi
+
+        local helper
+        helper=$(get_system_aur_helper)
+        
+        for pkg in "${missing_shell_pkgs[@]}"; do
+            log_info "Installing required tool: $pkg"
+            if sudo pacman -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
+                log_success "Successfully installed native package: $pkg"
+                INSTALLED_PACKAGES+=("$pkg")
+            else
+                if [ -n "$helper" ]; then
+                    log_info "Retrying package installation with helper: $helper"
+                    if "$helper" -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
+                        log_success "Successfully installed AUR package: $pkg"
+                        INSTALLED_PACKAGES+=("$pkg")
+                        continue
+                    fi
+                fi
+                log_fail "Critical dependency installation failure: $pkg"
+                exit 1
+            fi
+        done
+    else
+        log_success "All shell tool dependencies are already met."
+    fi
+
+    # 2. Oh My Zsh Framework Core Deployment
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        log_info "Installing Oh My Zsh framework..."
+        if ! $HAS_INTERNET; then
+            log_fail "Network offline. Cannot fetch Oh My Zsh installer."
+            exit 1
+        fi
+        if curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > "$LOG_DIR/omz-install.sh" 2>>"$LOG_FILE"; then
+            if sh "$LOG_DIR/omz-install.sh" --unattended --keep-zshrc >>"$LOG_FILE" 2>&1; then
+                log_success "Oh My Zsh deployment successfully completed."
+            else
+                log_fail "Oh My Zsh installation script reported execution errors."
+                exit 1
+            fi
+        else
+            log_fail "Failed to safely fetch Oh My Zsh web installer binary."
+            exit 1
+        fi
+    else
+        log_success "Oh My Zsh framework is already present."
+    fi
+
+    # 3. Powerlevel10k Prompt Setup
+    local p10k_dest="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+    if [ ! -d "$p10k_dest" ]; then
+        log_info "Cloning Powerlevel10k theme asset tree..."
+        if ! $HAS_INTERNET; then
+            log_fail "Network offline. Cannot clone Powerlevel10k theme."
+            exit 1
+        fi
+        if git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dest" >>"$LOG_FILE" 2>&1; then
+            log_success "Powerlevel10k configuration theme cloned."
+        else
+            log_fail "Failed to successfully clone Powerlevel10k repository mirror target."
+            exit 1
+        fi
+    else
+        log_success "Powerlevel10k theme repository structure is already present."
+    fi
+
+    # 4. Interactive Zsh Extension Plugins Setup
+    local plugin_names=("zsh-autosuggestions" "zsh-syntax-highlighting")
+    declare -A plugin_urls=(
+        ["zsh-autosuggestions"]="https://github.com/zsh-users/zsh-autosuggestions"
+        ["zsh-syntax-highlighting"]="https://github.com/zsh-users/zsh-syntax-highlighting"
+    )
+
+    local pl
+    for pl in "${plugin_names[@]}"; do
+        local pl_dest="$HOME/.oh-my-zsh/custom/plugins/$pl"
+        if [ ! -d "$pl_dest" ]; then
+            log_info "Cloning system extension zsh plugin: $pl"
+            if ! $HAS_INTERNET; then
+                log_fail "Network offline. Cannot clone plugin: $pl"
+                exit 1
+            fi
+            if git clone --depth=1 "${plugin_urls[$pl]}" "$pl_dest" >>"$LOG_FILE" 2>&1; then
+                log_success "Plugin linked cleanly: $pl"
+            else
+                log_fail "Failed to pull configuration plugin assets: $pl"
+                exit 1
+            fi
+        else
+            log_success "Extension configuration plugin already found: $pl"
+        fi
+    done
+
+    # 5. Backup Layer Safeguards Execution
+    local backup_targets=(".zshrc" ".p10k.zsh")
+    local tgt
+    for tgt in "${backup_targets[@]}"; do
+        if [ -e "$HOME/$tgt" ] || [ -L "$HOME/$tgt" ]; then
+            log_info "Preserving pre-existing system copy of: $tgt"
+            if rm -f "$HOME/$tgt.backup" 2>>"$LOG_FILE" && mv "$HOME/$tgt" "$HOME/$tgt.backup" 2>>"$LOG_FILE"; then
+                log_success "Saved shell configuration file copy backup to: $tgt.backup"
+            else
+                log_warn "Failed to rename or shift file location map item: $tgt"
+            fi
+        fi
+    done
+
+    # 6. Repository User Space Layout Deployment
+    if [ -f "home/.zshrc" ]; then
+        if cp -f "home/.zshrc" "$HOME/.zshrc" 2>>"$LOG_FILE"; then
+            log_success "Deployed target user profile link mapping: ~/.zshrc"
+        else
+            log_fail "Failed to copy user environment file: home/.zshrc"
+            exit 1
+        fi
+    else
+        log_warn "Repository layout missing configuration context element: home/.zshrc"
+    fi
+
+    if [ -f "home/.p10k.zsh" ]; then
+        if cp -f "home/.p10k.zsh" "$HOME/.p10k.zsh" 2>>"$LOG_FILE"; then
+            log_success "Deployed target user prompt profile link mapping: ~/.p10k.zsh"
+        else
+            log_fail "Failed to copy prompt layout configuration item: home/.p10k.zsh"
+            exit 1
+        fi
+    else
+        log_warn "Repository layout missing configuration context element: home/.p10k.zsh"
+    fi
+
+    # 7. System Execution Shell Switch
+    local target_shell
+    target_shell=$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")
+    if [[ "${SHELL:-}" != *zsh ]]; then
+        log_info "Configuring default login shell profile path context target..."
+        # Resolved SC2024: Redirect output properly with standard user permissions inside subshell or using tee
+        if chsh -s "$target_shell" "$USER" >>"$LOG_FILE" 2>&1; then
+            log_success "User default login workspace shell updated to: $target_shell"
+        else
+            log_warn "Failed to execute default shell change command automatically."
+        fi
+    else
+        log_success "Zsh is already registered as the default workspace shell environment."
+    fi
+
+    # 8. Complete Internal Operational Phase Log
+    log_success "Gigi's Shell Configuration pipeline successfully processed."
+}
+
 phase_signal_environments() {
     log_step "Reloading Running Applications"
     if $DRY_RUN; then log_info "Dry Run: Bypassing operational live reloads."; return; fi
@@ -501,7 +687,7 @@ phase_signal_environments() {
 phase_compile_summary() {
     log_step "Installation Summary"
     local end_time
-  end_time=$(date +%s)
+    end_time=$(date +%s)
     local elapsed=$((end_time - START_TIME))
     
     echo -e "  ${BOLD}✓ Installed Packages:${NC}       ${GREEN}${INSTALLED_PACKAGES[*]:-None}${NC}"
@@ -591,6 +777,7 @@ run_orchestrated_installer() {
     phase_resolve_dependencies
     phase_execute_backup
     phase_deploy_configs "$interactive"
+    phase_install_shell_config
     phase_signal_environments
     phase_compile_summary
     

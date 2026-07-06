@@ -143,6 +143,6 @@ pokemon() {
     fi
 }
 
-export PATH=$PATH:/home/gigi/.spicetify
+export PATH="$PATH:$HOME/.spicetify"
 
 export PATH="$HOME/.local/bin:$PATH"
