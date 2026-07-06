@@ -33,7 +33,7 @@
         ],
         "position": "follow_bar",
         "screenshotAnnotationTool": "",
-        "showCategories": true,
+        "showCategories": false,
         "showIconBackground": false,
         "sortByMostUsed": true,
         "terminalCommand": "kitty -e",
@@ -735,7 +735,7 @@
     },
     "wallpaper": {
         "automationEnabled": true,
-        "directory": "/home/gigi/Pictures/Wallpapers",
+        "directory": "~/Pictures/Wallpapers",
         "enableMultiMonitorDirectories": false,
         "enabled": true,
         "favorites": [

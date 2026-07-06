@@ -86,16 +86,16 @@ Every configuration included here is the one I personally use.
 
 # 🛠 Software Used
 
-| Component | Software |
-|------------|----------|
-| Window Manager | Niri |
-| Shell | Noctalia |
-| Terminal | Kitty |
-| Editor | Neovim |
-| Music | MPD + rmpc |
-| File Manager | Yazi |
-| Media Player | MPV |
-| System Info | Fastfetch |
+| Component      | Software   |
+| -------------- | ---------- |
+| Window Manager | Niri       |
+| Shell          | Noctalia   |
+| Terminal       | Kitty      |
+| Editor         | Neovim     |
+| Music          | MPD + rmpc |
+| File Manager   | Yazi       |
+| Media Player   | MPV        |
+| System Info    | Fastfetch  |
 
 ---
 
@@ -182,27 +182,27 @@ Repeat for any remaining configuration folders as needed.
 
 ### 🖥 Noctalia
 
-| Shortcut | Action |
-|----------|--------|
-| <kbd>Super</kbd> + <kbd>L</kbd> | Lock Screen |
-| <kbd>Super</kbd> + <kbd>,</kbd> | Toggle Wallpaper Picker |
-| <kbd>Super</kbd> + <kbd>.</kbd> | Open Emoji Picker |
-| <kbd>Super</kbd> + <kbd>V</kbd> | Open Clipboard History |
-| <kbd>Super</kbd> + <kbd>D</kbd> | Toggle Control Center |
+| Shortcut                          | Action                    |
+| --------------------------------- | ------------------------- |
+| <kbd>Super</kbd> + <kbd>L</kbd>   | Lock Screen               |
+| <kbd>Super</kbd> + <kbd>,</kbd>   | Toggle Wallpaper Picker   |
+| <kbd>Super</kbd> + <kbd>.</kbd>   | Open Emoji Picker         |
+| <kbd>Super</kbd> + <kbd>V</kbd>   | Open Clipboard History    |
+| <kbd>Super</kbd> + <kbd>D</kbd>   | Toggle Control Center     |
 | <kbd>Alt</kbd> + <kbd>Space</kbd> | Open Application Launcher |
 
 ---
 
 ### 🚀 Applications
 
-| Shortcut | Action |
-|----------|--------|
-| <kbd>Super</kbd> + <kbd>T</kbd> | Open Kitty |
-| <kbd>Super</kbd> + <kbd>B</kbd> | Open Browser |
-| <kbd>Super</kbd> + <kbd>E</kbd> | Open File Manager |
-| <kbd>Super</kbd> + <kbd>M</kbd> | Open Music Player |
+| Shortcut                        | Action               |
+| ------------------------------- | -------------------- |
+| <kbd>Super</kbd> + <kbd>T</kbd> | Open Kitty           |
+| <kbd>Super</kbd> + <kbd>B</kbd> | Open Browser         |
+| <kbd>Super</kbd> + <kbd>E</kbd> | Open File Manager    |
+| <kbd>Super</kbd> + <kbd>M</kbd> | Open Music Player    |
 | <kbd>Super</kbd> + <kbd>O</kbd> | Open Note Taking app |
-| <kbd>Super</kbd> + <kbd>C</kbd> | Open CodeEditor |
+| <kbd>Super</kbd> + <kbd>C</kbd> | Open CodeEditor      |
 
 </details>
 
@@ -218,14 +218,14 @@ Repeat for any remaining configuration folders as needed.
 These are the applications configured by default in this rice.
 All keybinds will open this if not changed.
 
-| Category | Application |
-|----------|-------------|
-| 🌐 Browser | Helium Browser |
-| 💻 Terminal | Kitty |
-| 📝 Code Editor | VSCodium |
-| 📖 Notes | Obsidian |
-| 📂 File Manager | Thunar |
-| 🎵 Music | Spotify |
+| Category        | Application    |
+| --------------- | -------------- |
+| 🌐 Browser      | Helium Browser |
+| 💻 Terminal     | Kitty          |
+| 📝 Code Editor  | VSCodium       |
+| 📖 Notes        | Obsidian       |
+| 📂 File Manager | Thunar         |
+| 🎵 Music        | Spotify        |
 
 </details>
 
@@ -284,4 +284,4 @@ If you like this setup:
 
 ---
 
-> *"My desktop may be minimal, but the time spent configuring it definitely wasn't."* 😭
+> _"My desktop may be minimal, but the time spent configuring it definitely wasn't."_ 😭
