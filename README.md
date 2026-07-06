@@ -173,33 +173,6 @@ Repeat for any remaining configuration folders as needed.
 
 ---
 
-## 🐚 Optional Shell Configuration
-
-The repository also includes my personal shell configuration inside the `home/` directory.
-
-Included files:
-
-- `.zshrc`
-- `.p10k.zsh`
-
-These files are **optional** and are **not installed automatically**, allowing you to continue using Bash, Fish, or any other shell you prefer.
-
-If you'd like the same shell setup shown in the screenshots, install:
-
-- Zsh
-- Oh My Zsh
-- Powerlevel10k
-
-Then copy the files:
-
-```bash
-cp home/.zshrc ~/
-cp home/.p10k.zsh ~/
-```
-
----
-
-
 # ⌨️ Keybindings
 
 <details>
