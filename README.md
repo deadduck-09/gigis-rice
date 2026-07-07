@@ -108,6 +108,7 @@ Before installing this rice, make sure you have:
 - An **Arch Linux** based system
 - **Niri** installed
 - **Noctalia v4.7.7**
+- It is recommended to have the applications listed above installed beforehand.
 
 Install Noctalia using:
 
