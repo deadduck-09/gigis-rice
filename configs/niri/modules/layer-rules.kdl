@@ -1,0 +1,15 @@
+//=============// 
+// Layers-rule // 
+//=============// 
+layer-rule {
+  match namespace="^noctalia-overview*" //blur wallpaper on overview for noctalia-shell, enable "Overview wallpaper" in the settings
+  place-within-backdrop true
+}
+
+// Noctalia: blur everwhere without xray for better look //
+layer-rule {
+  match namespace="^noctalia-(background|launcher-overlay|dock)-.$"
+  background-effect {
+    xray false 
+  }
+}
