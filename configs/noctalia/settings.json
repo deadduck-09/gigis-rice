@@ -240,7 +240,7 @@
                 "id": "calendar-month-card"
             },
             {
-                "enabled": true,
+                "enabled": false,
                 "id": "weather-card"
             }
         ]
@@ -275,7 +275,7 @@
                 "id": "brightness-card"
             },
             {
-                "enabled": false,
+                "enabled": true,
                 "id": "weather-card"
             },
             {
@@ -715,6 +715,10 @@
             {
                 "enabled": true,
                 "id": "kitty"
+            },
+            {
+                "enabled": true,
+                "id": "zed"
             }
         ],
         "enableUserTheming": true
@@ -764,7 +768,7 @@
         "overviewEnabled": true,
         "overviewTint": 0.6,
         "panelPosition": "follow_bar",
-        "randomIntervalSec": 7200,
+        "randomIntervalSec": 3600,
         "setWallpaperOnAllMonitors": true,
         "showHiddenFiles": true,
         "skipStartupTransition": false,
