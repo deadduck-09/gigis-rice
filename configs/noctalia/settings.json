@@ -482,7 +482,7 @@
     "idle": {
         "customCommands": "[]",
         "enabled": true,
-        "fadeDuration": 1,
+        "fadeDuration": 5,
         "lockCommand": "",
         "lockTimeout": 90,
         "resumeLockCommand": "",
@@ -491,7 +491,7 @@
         "screenOffCommand": "",
         "screenOffTimeout": 120,
         "suspendCommand": "",
-        "suspendTimeout": 300
+        "suspendTimeout": 900
     },
     "location": {
         "analogClockInCalendar": false,
