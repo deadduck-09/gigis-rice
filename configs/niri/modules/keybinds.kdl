@@ -176,6 +176,6 @@ binds {
 
   // Quiting & Power-Off 
   // Super+Shift+E { quit; } 
-  // Ctrl+Alt+Delete { quit; } 
+  Ctrl+Alt+Delete { quit; } 
   // Super+Shift+P { power-off-monitors; }
 }

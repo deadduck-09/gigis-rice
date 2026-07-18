@@ -107,14 +107,7 @@ Before installing this rice, make sure you have:
 
 - An **Arch Linux** based system
 - **Niri** installed
-- **Noctalia v4.7.7**
-- It is recommended to have the **Default Applications** installed beforehand (the scripts installs them too)
-
-Install Noctalia using:
-
-```bash
-paru -S noctalia-shell
-```
+- It is recommended to have the **Default Applications** installed beforehand (the script installs them too)
 
 ---
 
@@ -139,13 +132,17 @@ Run the installer:
 ./install.sh
 ```
 
+Log out using:
+
+Ctrl+Alt+Delete
+
 ### Installer Features
 
 - 📦 Automatically installs missing packages
 - 🧩 Supports both official repositories and AUR (`yay` / `paru`)
 - 📂 Automatically deploys configuration files
 - 💾 Creates backups of existing configurations
-- 🔄 Restore backups directly from the installer
+- 🔄 Restore backups directly through the installer
 - 🧪 Dry Run mode to preview changes
 - 📝 Detailed installation logs for troubleshooting
 
@@ -245,13 +242,33 @@ For my complete wallpaper collection, visit:
 # 📂 Repository Structure
 
 ```text
-configs/         Application configuration files
-home/            Optional shell configuration
-screenshots/     Preview images
-wallpapers/      Wallpapers used in the rice
-install.sh       Interactive installer
-README.md
-LICENSE
+.
+├── configs
+│   ├── fastfetch
+│   ├── fish
+│   ├── kitty
+│   ├── mpd
+│   ├── mpv
+│   ├── niri
+│   ├── noctalia
+│   ├── nvim
+│   ├── rmpc
+│   ├── starship.toml
+│   └── yazi
+├── home
+├── install.sh
+├── LICENSE
+├── README.md
+├── screenshots
+│   ├── Desktop.png
+│   ├── launcher.png
+│   ├── niri-overview.png
+│   ├── rmpc.png
+│   └── terminals.png
+└── wallpapers
+    ├── crane.png
+    ├── deathnote.jpg
+    └── Violet-Evergarden.png
 ```
 
 ---
