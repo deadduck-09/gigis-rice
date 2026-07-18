@@ -15,9 +15,8 @@ START_TIME=$(date +%s)
 readonly START_TIME
 
 # --- Immutable Global System Constants ---
-readonly VERSION="3.0.0"
+readonly VERSION="3.2.0"
 readonly AUTHOR="Gigi"
-# readonly REPO_URL="https://github.com/deadduck-09/gigis-rice"
 readonly LOG_DIR="$HOME/.cache/gigis-rice"
 readonly LOG_FILE="$LOG_DIR/install.log"
 TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
@@ -35,7 +34,6 @@ readonly PURPLE='\033[0;35m'
 readonly CYAN='\033[0;36m'
 
 # --- Component Profile Ordering Matrix ---
-# Defines the precise sequential installation execution order.
 readonly PREFERRED_ORDER=(
     "niri"
     "noctalia"
@@ -49,7 +47,6 @@ readonly PREFERRED_ORDER=(
 )
 
 # --- Component Configuration Specification Maps ---
-# Decouples config directories from binary commands and package names.
 declare -A BINARY_MAP=(
     ["nvim"]="nvim"
     ["kitty"]="kitty"
@@ -71,14 +68,14 @@ declare -A PACKAGE_MAP=(
     ["mpv"]="mpv"
     ["mpd"]="mpd"
     ["niri"]="niri"
-    ["noctalia"]="noctalia-git"
+    ["noctalia"]="noctalia-shell"
     ["rmpc"]="rmpc"
     ["yazi"]="yazi"
 )
 
 # --- Runtime Analytical State Trackers ---
 CURRENT_STEP=0
-TOTAL_STEPS=9  # Incremented to 9 to account for the new Shell Configuration Phase
+TOTAL_STEPS=10
 
 INSTALLED_CONFIGS=()
 SKIPPED_CONFIGS=()
@@ -94,7 +91,6 @@ HAS_INTERNET=true
 # 1. System Logging & Signal Processing Infrastructure
 # ==============================================================================
 
-# Ensure the log ecosystem exists immediately
 mkdir -p "$LOG_DIR"
 echo "=== GIGI'S RICE INITIALIZATION AUDIT RUNNING AT $(date) ===" > "$LOG_FILE"
 
@@ -123,7 +119,7 @@ print_banner() {
     clear
     echo -e "${PURPLE}╔═════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${PURPLE}║                                                                 ║${NC}"
-    echo -e "${PURPLE}║                 ${GREEN}🌿 Gigi's Rice Installer 🌿${PURPLE}                     ║${NC}"
+    echo -e "${PURPLE}║                  ${GREEN}🌿 Gigi's Rice Installer 🌿${PURPLE}                     ║${NC}"
     echo -e "${PURPLE}║                                                                 ║${NC}"
     echo -e "${PURPLE}║                  ${CYAN}Niri + Noctalia Configuration${PURPLE}                  ║${NC}"
     echo -e "${PURPLE}║                                                                 ║${NC}"
@@ -174,7 +170,6 @@ verify_environment() {
         log_fail "Directory root error. Script must be executed inside the git repository."
         exit 1
     fi
-
     if [ ! -f /etc/arch-release ]; then
         log_fail "Distribution target unsupported. This profile requires Arch Linux."
         exit 1
@@ -183,7 +178,6 @@ verify_environment() {
 
 probe_network() {
     log_to_file "NETWORK" "Running network link tests."
-    # High performance /dev/tcp connection attempt to public DNS servers
     if { true > "/dev/tcp/1.1.1.1/53"; } &>/dev/null || \
        { true > "/dev/tcp/8.8.8.8/53"; } &>/dev/null; then
         HAS_INTERNET=true
@@ -198,29 +192,26 @@ get_discovered_modules() {
     local dynamic_modules=()
     local ordered_item
     
-    # 1. Add configurations specified in the installation order
     for ordered_item in "${PREFERRED_ORDER[@]}"; do
         if [ -d "configs/$ordered_item" ]; then
             dynamic_modules+=("$ordered_item")
         fi
     done
     
-    # 2. Scan and append any newly added configurations found in the directory
     if [ -d "configs" ]; then
         local entry
         for entry in configs/*; do
+            # STRICT GUARD: Ensure we only map subdirectories to avoid files like starship.toml
             if [ -d "$entry" ]; then
                 local base_entry="${entry##*/}"
                 local is_known=false
                 local known_item
-                
                 for known_item in "${dynamic_modules[@]}"; do
                     if [[ "$known_item" == "$base_entry" ]]; then
                         is_known=true
                         break
                     fi
                 done
-                
                 if ! $is_known; then
                     dynamic_modules+=("$base_entry")
                 fi
@@ -246,24 +237,48 @@ get_system_aur_helper() {
 
 phase_validate_env() {
     log_step "Validating Environment"
-    
     if ! command -v niri &>/dev/null; then
         log_warn "Niri window manager not found in local system bin paths."
     else
         log_success "Niri base environment verified."
     fi
+}
 
-    if ! command -v noctalia &>/dev/null; then
-        log_warn "Noctalia configuration shell interface not found."
+phase_build_noctalia() {
+    log_step "Verifying Noctalia Shell Installation"
+    if command -v noctalia &>/dev/null; then
+        log_success "Noctalia configuration shell is already built and available."
+        ALREADY_PRESENT_PACKAGES+=("noctalia-shell")
+        return
+    fi
+
+    log_warn "Noctalia shell binary missing. Commencing AUR deployment build..."
+    if $DRY_RUN; then log_info "Dry Run: Skipping Noctalia compilation."; return; fi
+    if ! $HAS_INTERNET; then
+        log_fail "Network required to compile Noctalia. Aborting environment build."
+        exit 1
+    fi
+
+    local helper
+    helper=$(get_system_aur_helper)
+    if [ -z "$helper" ]; then
+        log_fail "No active AUR helper (yay/paru) found. Please install an AUR helper first."
+        exit 1
+    fi
+
+    log_info "Invoking $helper to provision noctalia-shell..."
+    if "$helper" -S --needed --noconfirm noctalia-shell 2>>"$LOG_FILE"; then
+        log_success "Successfully deployed Noctalia shell via $helper."
+        INSTALLED_PACKAGES+=("noctalia-shell")
     else
-        log_success "Noctalia base environment verified."
+         log_fail "AUR tracking installation failed for package target: noctalia-shell"
+         exit 1
     fi
 }
 
 phase_system_refresh() {
     log_step "Updating System"
     if $DRY_RUN; then log_info "Dry Run: Skipping system updates."; return; fi
-
     if ! $HAS_INTERNET; then
         log_warn "Offline state detected. Skipping pacman mirror sync operations."
         return
@@ -273,7 +288,7 @@ phase_system_refresh() {
     choice=${choice:-Y}
     if [[ "$choice" =~ ^[Yy]$ ]]; then
         log_info "Running pacman system upgrade..."
-        if sudo pacman -Syu; then
+        if sudo pacman -Syu --noconfirm; then
             log_success "System update complete."
         else
             log_fail "Pacman synchronization encountered an execution error."
@@ -306,7 +321,6 @@ phase_inspect_dependencies() {
 phase_resolve_dependencies() {
     log_step "Installing Missing Programs"
     if $DRY_RUN; then log_info "Dry Run: Skipping application deployment."; return; fi
-
     if ! $HAS_INTERNET; then
         log_warn "Network connection required to install packages. Skipping package deployment."
         return
@@ -315,7 +329,6 @@ phase_resolve_dependencies() {
     local modules
     mapfile -t modules < <(get_discovered_modules)
     local missing_pkgs=()
-    local missing_mods=()
 
     local mod
     for mod in "${modules[@]}"; do
@@ -324,7 +337,6 @@ phase_resolve_dependencies() {
         
         if ! command -v "$check_cmd" &>/dev/null; then
             missing_pkgs+=("$target_pkg")
-            missing_mods+=("$mod")
         fi
     done
 
@@ -345,11 +357,9 @@ phase_resolve_dependencies() {
     local helper
     helper=$(get_system_aur_helper)
 
-    local i
-    for ((i=0; i<${#missing_pkgs[@]}; i++)); do
-        local pkg="${missing_pkgs[i]}"
+    local pkg
+    for pkg in "${missing_pkgs[@]}"; do
         log_info "Installing package: $pkg"
-        
         if sudo pacman -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
             log_success "Successfully installed native package: $pkg"
             INSTALLED_PACKAGES+=("$pkg")
@@ -427,7 +437,6 @@ phase_deploy_configs() {
                 log_info "Dry Run: Would safe-deploy configurations path profile module: $mod"
                 INSTALLED_CONFIGS+=("$mod")
             else
-                # Atomic deployment: Copy files to a temporary directory first, then move them into place
                 local tmp_dest="$HOME/.config/.$mod.tmp.$TIMESTAMP"
                 local final_dest="$HOME/.config/$mod"
                 
@@ -466,7 +475,7 @@ phase_deploy_configs() {
                 "fonts")      dest="$HOME/.local/share/fonts" ;;
                 "themes")     dest="$HOME/.local/share/themes" ;;
                 "icons")      dest="$HOME/.local/share/icons" ;;
-                "bin")         dest="$HOME/.local/bin" ;;
+                "bin")        dest="$HOME/.local/bin" ;;
             esac
             
             if [ -n "$dest" ]; then
@@ -487,189 +496,130 @@ phase_deploy_configs() {
 }
 
 # ==============================================================================
-# NEW MODULE: Gigi's Shell Configuration Pipeline
+# 5. Dynamic Shell Selector & Non-Blocking Provisioning Engine
 # ==============================================================================
 
 phase_install_shell_config() {
-    log_step "Gigi's Shell Configuration"
+    log_step "Dynamic Shell Configuration"
     
-    read -rp "  Would you like to install Gigi's Shell Configuration? [Y/n]: " choice
-    choice=${choice:-Y}
-    if [[ ! "$choice" =~ ^[Yy]$ ]]; then
-        log_info "Gigi's Shell Configuration skipped by user choice."
+    echo -e "  ${BOLD}Select your preferred terminal environment profile:${NC}"
+    echo -e "  ${GREEN}[1]${NC} Zsh + Powerlevel10k Setup"
+    echo -e "  ${GREEN}[2]${NC} Fish + Starship Setup"
+    echo -e "  ${YELLOW}[3]${NC} Skip Shell Optimization Phase"
+    echo -e "───────────────────────────────────────────────────────────────────${NC}"
+    read -rp "Selection [1-3]: " shell_choice
+
+    if [[ "$shell_choice" == "3" ]]; then
+        log_info "Shell dynamic pipeline phase bypassed by user request."
         return
     fi
 
     if $DRY_RUN; then
-        log_info "Dry Run: Skipping shell component deployments."
+        log_info "Dry Run: Skipping shell workspace structural mutation."
         return
     fi
 
-    # 1. Core Base Tooling Validation
-    log_info "Verifying prerequisite package binaries (zsh, git, curl)..."
-    local shell_pkgs=("zsh" "git" "curl")
-    local missing_shell_pkgs=()
-    local pkg
+    local helper
+    helper=$(get_system_aur_helper)
 
-    for pkg in "${shell_pkgs[@]}"; do
-        if ! command -v "$pkg" &>/dev/null; then
-            missing_shell_pkgs+=("$pkg")
-        fi
-    done
-
-    if [ ${#missing_shell_pkgs[@]} -gt 0 ]; then
-        log_info "Missing shell dependencies: ${missing_shell_pkgs[*]}"
-        if ! $HAS_INTERNET; then
-            log_fail "Network access unavailable. Cannot install missing required shell packages."
-            exit 1
-        fi
-
-        local helper
-        helper=$(get_system_aur_helper)
-        
-        for pkg in "${missing_shell_pkgs[@]}"; do
-            log_info "Installing required tool: $pkg"
-            if sudo pacman -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
-                log_success "Successfully installed native package: $pkg"
-                INSTALLED_PACKAGES+=("$pkg")
-            else
-                if [ -n "$helper" ]; then
-                    log_info "Retrying package installation with helper: $helper"
-                    if "$helper" -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
-                        log_success "Successfully installed AUR package: $pkg"
-                        INSTALLED_PACKAGES+=("$pkg")
-                        continue
-                    fi
-                fi
-                log_fail "Critical dependency installation failure: $pkg"
-                exit 1
+    if [[ "$shell_choice" == "1" ]]; then
+        # ======================================================================
+        # ZSH + POWERLEVEL10K PIPELINE
+        # ======================================================================
+        log_info "Initializing Zsh Ecosystem Sync..."
+        local zsh_deps=("zsh" "git" "curl")
+        local dep
+        for dep in "${zsh_deps[@]}"; do
+            if ! command -v "$dep" &>/dev/null; then
+                log_info "Provisioning missing core dependency: $dep"
+                sudo pacman -S --needed --noconfirm "$dep" 2>>"$LOG_FILE" || "$helper" -S --needed --noconfirm "$dep" 2>>"$LOG_FILE"
             fi
         done
-    else
-        log_success "All shell tool dependencies are already met."
-    fi
 
-    # 2. Oh My Zsh Framework Core Deployment
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        log_info "Installing Oh My Zsh framework..."
-        if ! $HAS_INTERNET; then
-            log_fail "Network offline. Cannot fetch Oh My Zsh installer."
-            exit 1
+        # Oh My Zsh Framework Core Deployment
+        if [ ! -d "$HOME/.oh-my-zsh" ]; then
+            log_info "Cloning and building standalone Oh My Zsh framework..."
+            if ! $HAS_INTERNET; then log_fail "Network offline. Cannot fetch OMZ framework."; exit 1; fi
+            curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > "$LOG_DIR/omz-install.sh"
+            sh "$LOG_DIR/omz-install.sh" --unattended --keep-zshrc >>"$LOG_FILE" 2>&1
         fi
-        if curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > "$LOG_DIR/omz-install.sh" 2>>"$LOG_FILE"; then
-            if sh "$LOG_DIR/omz-install.sh" --unattended --keep-zshrc >>"$LOG_FILE" 2>&1; then
-                log_success "Oh My Zsh deployment successfully completed."
-            else
-                log_fail "Oh My Zsh installation script reported execution errors."
-                exit 1
+
+        # Powerlevel10k Prompt Setup
+        local p10k_dest="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+        if [ ! -d "$p10k_dest" ]; then
+            log_info "Syncing Powerlevel10k asset tree branches..."
+            git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dest" >>"$LOG_FILE" 2>&1
+        fi
+
+        # Plugins Mapping Setup
+        local plugins=("zsh-autosuggestions" "zsh-syntax-highlighting")
+        declare -A urls=(
+            ["zsh-autosuggestions"]="https://github.com/zsh-users/zsh-autosuggestions"
+            ["zsh-syntax-highlighting"]="https://github.com/zsh-users/zsh-syntax-highlighting"
+        )
+        for pl in "${plugins[@]}"; do
+            if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/$pl" ]; then
+                log_info "Cloning custom plugin: $pl"
+                git clone --depth=1 "${urls[$pl]}" "$HOME/.oh-my-zsh/custom/plugins/$pl" >>"$LOG_FILE" 2>&1
             fi
-        else
-            log_fail "Failed to safely fetch Oh My Zsh web installer binary."
-            exit 1
-        fi
-    else
-        log_success "Oh My Zsh framework is already present."
-    fi
+        done
 
-    # 3. Powerlevel10k Prompt Setup
-    local p10k_dest="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
-    if [ ! -d "$p10k_dest" ]; then
-        log_info "Cloning Powerlevel10k theme asset tree..."
-        if ! $HAS_INTERNET; then
-            log_fail "Network offline. Cannot clone Powerlevel10k theme."
-            exit 1
-        fi
-        if git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dest" >>"$LOG_FILE" 2>&1; then
-            log_success "Powerlevel10k configuration theme cloned."
-        else
-            log_fail "Failed to successfully clone Powerlevel10k repository mirror target."
-            exit 1
-        fi
-    else
-        log_success "Powerlevel10k theme repository structure is already present."
-    fi
-
-    # 4. Interactive Zsh Extension Plugins Setup
-    local plugin_names=("zsh-autosuggestions" "zsh-syntax-highlighting")
-    declare -A plugin_urls=(
-        ["zsh-autosuggestions"]="https://github.com/zsh-users/zsh-autosuggestions"
-        ["zsh-syntax-highlighting"]="https://github.com/zsh-users/zsh-syntax-highlighting"
-    )
-
-    local pl
-    for pl in "${plugin_names[@]}"; do
-        local pl_dest="$HOME/.oh-my-zsh/custom/plugins/$pl"
-        if [ ! -d "$pl_dest" ]; then
-            log_info "Cloning system extension zsh plugin: $pl"
-            if ! $HAS_INTERNET; then
-                log_fail "Network offline. Cannot clone plugin: $pl"
-                exit 1
+        # Deploy Zsh Dotfiles from home/ matrix
+        local f
+        for f in ".zshrc" ".p10k.zsh"; do
+            if [ -f "$HOME/$f" ]; then mv "$HOME/$f" "$HOME/$f.backup" 2>>"$LOG_FILE"; fi
+            if [ -f "home/$f" ]; then 
+                cp -f "home/$f" "$HOME/$f"
+                log_success "Applied custom file: ~/$f"
             fi
-            if git clone --depth=1 "${plugin_urls[$pl]}" "$pl_dest" >>"$LOG_FILE" 2>&1; then
-                log_success "Plugin linked cleanly: $pl"
-            else
-                log_fail "Failed to pull configuration plugin assets: $pl"
-                exit 1
+        done
+
+        # Non-Blocking Shell Update Execution
+        local target_shell
+        target_shell=$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")
+        log_info "Updating system shell index target cleanly..."
+        sudo chsh -s "$target_shell" "$USER" </dev/null >>"$LOG_FILE" 2>&1 || true
+
+    elif [[ "$shell_choice" == "2" ]]; then
+        # ======================================================================
+        # FISH + STARSHIP PIPELINE
+        # ======================================================================
+        log_info "Initializing Fish + Starship Ecosystem Sync..."
+        local fish_deps=("fish" "starship")
+        local dep
+        for dep in "${fish_deps[@]}"; do
+            if ! command -v "$dep" &>/dev/null; then
+                log_info "Provisioning missing core dependency: $dep"
+                sudo pacman -S --needed --noconfirm "$dep" 2>>"$LOG_FILE" || "$helper" -S --needed --noconfirm "$dep" 2>>"$LOG_FILE"
             fi
-        else
-            log_success "Extension configuration plugin already found: $pl"
-        fi
-    done
+        done
 
-    # 5. Backup Layer Safeguards Execution
-    local backup_targets=(".zshrc" ".p10k.zsh")
-    local tgt
-    for tgt in "${backup_targets[@]}"; do
-        if [ -e "$HOME/$tgt" ] || [ -L "$HOME/$tgt" ]; then
-            log_info "Preserving pre-existing system copy of: $tgt"
-            if rm -f "$HOME/$tgt.backup" 2>>"$LOG_FILE" && mv "$HOME/$tgt" "$HOME/$tgt.backup" 2>>"$LOG_FILE"; then
-                log_success "Saved shell configuration file copy backup to: $tgt.backup"
-            else
-                log_warn "Failed to rename or shift file location map item: $tgt"
-            fi
+        # Safe Atomic Deploy for Fish native structures
+        if [ -d "configs/fish" ]; then
+            log_info "Deploying custom Fish sub-configurations matrix..."
+            rm -rf "$HOME/.config/fish"
+            cp -r configs/fish "$HOME/.config/" 2>>"$LOG_FILE"
+            log_success "Applied Fish configuration layout folder."
         fi
-    done
 
-    # 6. Repository User Space Layout Deployment
-    if [ -f "home/.zshrc" ]; then
-        if cp -f "home/.zshrc" "$HOME/.zshrc" 2>>"$LOG_FILE"; then
-            log_success "Deployed target user profile link mapping: ~/.zshrc"
-        else
-            log_fail "Failed to copy user environment file: home/.zshrc"
-            exit 1
+        # Safe Atomic Deploy for Starship (Located explicitly at configs/starship.toml)
+        if [ -f "configs/starship.toml" ]; then
+            log_info "Deploying custom prompt layouts config: starship.toml"
+            cp -f configs/starship.toml "$HOME/.config/starship.toml" 2>>"$LOG_FILE"
+            log_success "Applied Starship configuration mapping layout."
         fi
+
+        # Non-Blocking Shell Update Execution
+        local target_shell
+        target_shell=$(command -v fish 2>/dev/null || echo "/usr/bin/fish")
+        log_info "Updating system shell index target cleanly..."
+        sudo chsh -s "$target_shell" "$USER" </dev/null >>"$LOG_FILE" 2>&1 || true
     else
-        log_warn "Repository layout missing configuration context element: home/.zshrc"
+        log_fail "Invalid shell setup choice provided."
+        exit 1
     fi
 
-    if [ -f "home/.p10k.zsh" ]; then
-        if cp -f "home/.p10k.zsh" "$HOME/.p10k.zsh" 2>>"$LOG_FILE"; then
-            log_success "Deployed target user prompt profile link mapping: ~/.p10k.zsh"
-        else
-            log_fail "Failed to copy prompt layout configuration item: home/.p10k.zsh"
-            exit 1
-        fi
-    else
-        log_warn "Repository layout missing configuration context element: home/.p10k.zsh"
-    fi
-
-    # 7. System Execution Shell Switch
-    local target_shell
-    target_shell=$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")
-    if [[ "${SHELL:-}" != *zsh ]]; then
-        log_info "Configuring default login shell profile path context target..."
-        # Resolved SC2024: Redirect output properly with standard user permissions inside subshell or using tee
-        if chsh -s "$target_shell" "$USER" >>"$LOG_FILE" 2>&1; then
-            log_success "User default login workspace shell updated to: $target_shell"
-        else
-            log_warn "Failed to execute default shell change command automatically."
-        fi
-    else
-        log_success "Zsh is already registered as the default workspace shell environment."
-    fi
-
-    # 8. Complete Internal Operational Phase Log
-    log_success "Gigi's Shell Configuration pipeline successfully processed."
+    log_success "Target user environment runtime shell parameters updated."
 }
 
 phase_signal_environments() {
@@ -706,7 +656,7 @@ phase_compile_summary() {
 }
 
 # ==============================================================================
-# 5. Backup Restore Infrastructure Management
+# 6. Backup Restore Infrastructure Management
 # ==============================================================================
 
 execute_restore_operation() {
@@ -716,7 +666,6 @@ execute_restore_operation() {
     local backups=()
     if [ -d "$HOME" ]; then
         local dir
-        # Safely locate timestamped backup matrices using bash wildcards
         for dir in "$HOME"/.config-backup-*; do
             if [ -d "$dir" ]; then
                 backups+=("$dir")
@@ -750,7 +699,6 @@ execute_restore_operation() {
         for item in "$target_dir"/*; do
             if [ -e "$item" ]; then
                 local base_name="${item##*/}"
-                # Safely clear the target destination before copying files back
                 rm -rf "$HOME/.config/$base_name" 2>>"$LOG_FILE"
                 if cp -a "$item" "$HOME/.config/" 2>>"$LOG_FILE"; then
                     log_success "Restored: ~/.config/$base_name"
@@ -766,12 +714,13 @@ execute_restore_operation() {
 }
 
 # ==============================================================================
-# 6. Global Operational Entry Execution Orchestrator
+# 7. Global Operational Entry Execution Orchestrator
 # ==============================================================================
 
 run_orchestrated_installer() {
     local interactive=$1
     phase_validate_env
+    phase_build_noctalia
     phase_system_refresh
     phase_inspect_dependencies
     phase_resolve_dependencies
@@ -785,7 +734,7 @@ run_orchestrated_installer() {
     echo -e "${GREEN}${BOLD}                    Installation Complete!                         ${NC}"
     echo -e "${GREEN}                                                                   ${NC}"
     echo -e "${GREEN}         Please log out and log back in to reload your profile.    ${NC}"
-    echo -e "${GREEN}                   Enjoy Gigi's Rice 🌿                            ${NC}"
+    echo -e "${GREEN}                    Enjoy Gigi's Rice 🌿                            ${NC}"
     echo -e "${GREEN}═══════════════════════════════════════════════════════════════════${NC}\n"
 }
 
