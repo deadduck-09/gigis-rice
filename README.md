@@ -134,7 +134,9 @@ Run the installer:
 
 Log out using:
 
+```text
 Ctrl+Alt+Delete
+```
 
 ### Installer Features
 
