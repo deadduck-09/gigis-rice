@@ -68,7 +68,7 @@ fi
 # Pre-execution backup warning
 warning "This script will download your system baseline and call the styling script."
 warning "Existing configuration directories in ~/.config may be overwritten or backed up by the rice script."
-read -r -p "Do you want to proceed? (y/N): " confirm
+read -r -p "Do you want to proceed? (y/N): " confirm < /dev/tty
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
     msg "Installation aborted by user."
     exit 0
@@ -305,7 +305,7 @@ echo "All baseline application architectures and services are loaded."
 echo -e "${YELLOW}A system reboot is required to activate the sddm interface and load Niri.${NC}"
 echo "=========================================================="
 echo ""
-read -r -p "Would you like to reboot now? (y/N): " reboot_now
+read -r -p "Would you like to reboot now? (y/N): " reboot_now < /dev/tty
 if [[ "$reboot_now" =~ ^[Yy]$ ]]; then
     msg "Rebooting system..."
     sudo reboot
