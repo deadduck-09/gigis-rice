@@ -142,11 +142,8 @@ Ctrl+Alt+Delete
 
 - 📦 Automatically installs missing packages
 - 🧩 Supports both official repositories and AUR (`yay` / `paru`)
-- 📂 Automatically deploys configuration files
 - 💾 Creates backups of existing configurations
 - 🔄 Restore backups directly through the installer
-- 🧪 Dry Run mode to preview changes
-- 📝 Detailed installation logs for troubleshooting
 
 ---
 
@@ -240,6 +237,29 @@ For my complete wallpaper collection, visit:
 ➡️ **https://github.com/deadduck-09/FireWalls.git**
 
 ---
+
+## 🖥 Full System Installation (Optional)
+
+Starting with a fresh Arch Linux installation?
+
+A complete plug-and-play installer is also available. It installs the required packages, configures services, deploys the rice, and prepares the system so you can start using it immediately.
+
+Run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/deadduck-09/gigis-rice/main/fullsetup-install.sh | bash
+```
+
+### What it does
+
+- 📦 Installs all required packages
+- 🧩 Installs AUR dependencies
+- ⚙️ Enables required services
+- 🖼 Installs wallpapers
+- 🚀 Provides a ready-to-use desktop after installation
+
+> [!TIP]
+> This installer is intended for **fresh Arch Linux installations**. If you already have Niri and Noctalia set up, the standard `install.sh` installer above is the recommended option.
 
 # 📂 Repository Structure
 
