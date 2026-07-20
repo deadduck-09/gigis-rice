@@ -2,7 +2,7 @@
 
 # ==============================================================================
 # full-setup.sh - Gigi's Arch Linux Full-Setup Installer
-# curl -fsSL https://raw.githubusercontent.com/deadduck-09/gigis-rice/main/full-setup.sh | bash
+# curl -fsSL https://raw.githubusercontent.com/deadduck-09/gigis-rice/main/fullsetup-install.sh | bash
 # ==============================================================================
 # Focuses strictly on installing software, packages, services, and system prep.
 # Executes the local styling layer via install.sh safely from its own directory.
