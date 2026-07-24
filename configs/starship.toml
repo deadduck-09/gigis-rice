@@ -16,12 +16,12 @@ $cmd_duration $directory$git_branch
 
 [fill]
 symbol = '-'
-style = 'fg:245'
+style = 'fg:subtext0'
 
 # Replace the "❯" symbol in the prompt with "➜"
 [character]                            # The name of the module we are configuring is "character"
-success_symbol = "[ ](bold fg:243)"
-error_symbol = "[ ](bold fg:244)"
+success_symbol = "[ ](bold fg:blue)"
+error_symbol = "[ ](bold fg:red)"
 
 # Disable the package module, hiding it from the prompt completely
 [package]
@@ -32,7 +32,7 @@ style = "bg: 252"
 symbol = "󰘬"
 truncation_length = 12
 truncation_symbol = ""
-format = " 󰜥 [](bold fg:252)[$symbol $branch(:$remote_branch)](fg:235 bg:252)[ ](bold fg:252)"
+format = " 󰜥 [](bold fg:surface2)[$symbol $branch(:$remote_branch)](fg:text bg:surface2)[ ](bold fg:surface2)"
 
 [git_commit]
 commit_hash_length = 4
@@ -56,7 +56,7 @@ deleted = " 🗑 "
 
 [hostname]
 ssh_only = false
-format =  "[•$hostname](bg:252 bold fg:235)[](bold fg:252)"
+format =  "[•$hostname](bg:surface2 bold fg:text)[](bold fg:surface2)"
 trim_at = ".companyname.com"
 disabled = false
 
@@ -75,19 +75,19 @@ format = '🕙[\[ $time \]]($style) '
 time_format = "%T"
 
 [username]
-style_user = "bold bg:252 fg:235"
+style_user = "bold bg:surface2 fg:text"
 style_root = "red bold"
-format = "[](bold fg:252)[$user]($style)"
+format = "[](bold fg:surface2)[$user]($style)"
 disabled = false
 show_always = true
 
 [directory]
 home_symbol = " "
 read_only = "  "
-style = "bg:255 fg:240"
+style = "bg:mauve fg:text"
 truncation_length = 2
 truncation_symbol = ".../"
-format = '[](bold fg:255)[󰉋 → $path]($style)[](bold fg:255)'
+format = '[](bold fg:mauve)[󰉋 → $path]($style)[](bold fg:mauve)'
 
 
 [directory.substitutions]
@@ -101,7 +101,10 @@ format = '[](bold fg:255)[󰉋 → $path]($style)[](bold fg:255)'
 
 [cmd_duration]
 min_time = 0
-format = '[](bold fg:252)[󰪢 $duration](bold bg:252 fg:235)[](bold fg:252)'
+format = '[](bold fg:surface2)[󰪢 $duration](bold bg:surface2 fg:text)[](bold fg:surface2)'
+
+
+
 
 # >>> NOCTALIA STARSHIP PALETTE >>>
 # Noctalia Starship Palette (wallpaper-based)
@@ -109,40 +112,40 @@ format = '[](bold fg:252)[󰪢 $duration](bold bg:252 fg:235)[](bold fg:25
 
 [palettes.noctalia]
 # Standard colors
-blue      = "#f95263"
-red       = "#f8283d"
-green     = "#f98639"
-yellow    = "#f9e539"
-cyan      = "#fbb383"
-magenta   = "#fb8490"
+blue      = "#e47267"
+red       = "#b73428"
+green     = "#daa458"
+yellow    = "#cfda58"
+cyan      = "#e9c696"
+magenta   = "#ec9b93"
 white     = "#f3f2f2"
-black     = "#291416"
+black     = "#291614"
 
 # Extended palette (Catppuccin-compatible names)
-rosewater = "#f9e539"
-flamingo  = "#fbef83"
-pink      = "#fb8490"
-mauve     = "#b21a29"
-maroon    = "#f8283d"
-peach     = "#fbef83"
-teal      = "#f98639"
-sky       = "#fbb383"
-sapphire  = "#fbb383"
-lavender  = "#b21a29"
+rosewater = "#cfda58"
+flamingo  = "#e2e996"
+pink      = "#ec9b93"
+mauve     = "#9a3a32"
+maroon    = "#b73428"
+peach     = "#e2e996"
+teal      = "#daa458"
+sky       = "#e9c696"
+sapphire  = "#e9c696"
+lavender  = "#9a3a32"
 
 # Text shades
 text      = "#f3f2f2"
 subtext1  = "#b6afaf"
-subtext0  = "#756162"
+subtext0  = "#756260"
 
 # Surface shades
-overlay2  = "#756162"
+overlay2  = "#756260"
 overlay1  = "#b6afaf"
-overlay0  = "#371b1d"
-surface2  = "#371b1d"
-surface1  = "#291416"
-surface0  = "#291416"
-base      = "#291416"
-mantle    = "#291416"
-crust     = "#25181a"
+overlay0  = "#371d1b"
+surface2  = "#371d1b"
+surface1  = "#291614"
+surface0  = "#291614"
+base      = "#291614"
+mantle    = "#291614"
+crust     = "#251a18"
 # <<< NOCTALIA STARSHIP PALETTE <<<
