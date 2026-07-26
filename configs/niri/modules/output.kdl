@@ -14,5 +14,5 @@ output "eDP-1" {
   // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
   transform "normal"
 
-  position x=1280 y=0
+  position x=0 y=0
 }

@@ -14,6 +14,7 @@ binds {
   Alt+Space { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
   Super+N { spawn-sh "qs -c noctalia-shell ipc call notifications toggleHistory"; }
   Super+Escape { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
+  Super+Alt+I { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
 
   // Apps // 
   Super+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
@@ -176,6 +177,6 @@ binds {
 
   // Quiting & Power-Off 
   // Super+Shift+E { quit; } 
-  Ctrl+Alt+Delete { quit; } 
+   Ctrl+Alt+Delete { quit; } 
   // Super+Shift+P { power-off-monitors; }
 }
