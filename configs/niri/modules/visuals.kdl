@@ -14,3 +14,22 @@ blur {
   noise 0.03     // grain overlay 
   saturation 1.0 // color saturation boost 
 }
+
+// Recent Windows (Alt+Tab)// 
+recent-windows {
+    highlight {
+        active-color "#999999ff"
+        urgent-color "#ff9999ff"
+        padding 30
+        corner-radius 10
+    }
+
+    previews {
+        max-height 480
+        max-scale 0.5
+    }
+
+    binds {
+      Alt+Tab { next-window scope="workspace"; }
+    }
+}
