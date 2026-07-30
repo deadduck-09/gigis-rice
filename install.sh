@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Gigi's Rice Installer - Professional Production Grade Deployment Engine
-# Target Environment: Arch Linux (Niri + Noctalia Base Ecosystem)
-# Reference URL: https://github.com/deadduck-09/gigis-rice
+# Gigi's Rice Installer 
+# Target: Arch Linux (Niri + Noctalia)
+# Repo: https://github.com/deadduck-09/gigis-rice
 # ==============================================================================
 
-# Strict Execution Guard: Exit on errors, unset variables, and pipeline faults
+# Paranoia mode: Fail fast on errors, unset variables, and pipeline breaks
 set -euo pipefail
 IFS=$'\n\t'
 
-# --- Runtime Execution Performance Benchmarking ---
+# --- Stopwatch start ---
 START_TIME=$(date +%s)
 readonly START_TIME
 
-# --- Immutable Global System Constants ---
+# --- The constants we don't want to mess up ---
 readonly VERSION="3.2.0"
 readonly AUTHOR="Gigi"
 readonly LOG_DIR="$HOME/.cache/gigis-rice"
@@ -23,7 +23,7 @@ TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
 readonly TIMESTAMP
 readonly BACKUP_DIR="$HOME/.config-backup-$TIMESTAMP"
 
-# --- UI Color Space Definitions (ANSI Escape Matrix) ---
+# --- Pretty terminal colors ---
 readonly NC='\033[0m'
 readonly BOLD='\033[1m'
 readonly RED='\033[0;31m'
@@ -33,7 +33,7 @@ readonly BLUE='\033[0;34m'
 readonly PURPLE='\033[0;35m'
 readonly CYAN='\033[0;36m'
 
-# --- Component Profile Ordering Matrix ---
+# --- Order matters for these guys ---
 readonly PREFERRED_ORDER=(
     "niri"
     "noctalia"
@@ -46,7 +46,7 @@ readonly PREFERRED_ORDER=(
     "rmpc"
 )
 
-# --- Component Configuration Specification Maps ---
+# --- Mapping commands to their actual package names ---
 declare -A BINARY_MAP=(
     ["nvim"]="nvim"
     ["kitty"]="kitty"
@@ -73,7 +73,7 @@ declare -A PACKAGE_MAP=(
     ["yazi"]="yazi"
 )
 
-# --- Runtime Analytical State Trackers ---
+# --- Keep track of what actually happened ---
 CURRENT_STEP=0
 TOTAL_STEPS=10
 
@@ -88,11 +88,11 @@ DRY_RUN=false
 HAS_INTERNET=true
 
 # ==============================================================================
-# 1. System Logging & Signal Processing Infrastructure
+# 1. Boring setup stuff (Logs & error handling)
 # ==============================================================================
 
 mkdir -p "$LOG_DIR"
-echo "=== GIGI'S RICE INITIALIZATION AUDIT RUNNING AT $(date) ===" > "$LOG_FILE"
+echo "=== Gigi's Rice Installer woke up at $(date) ===" > "$LOG_FILE"
 
 log_to_file() {
     local level="$1"
@@ -103,8 +103,8 @@ log_to_file() {
 cleanup_handler() {
     local exit_code=$?
     if [ "$exit_code" -ne 0 ]; then
-        echo -e "\n\n${RED}${BOLD}❌ Script terminated unexpectedly. Detailed diagnostics written to: $LOG_FILE${NC}"
-        log_to_file "FATAL" "Execution process halted via shell trap error boundary."
+        echo -e "\n\n${RED}${BOLD}❌ Whoops! Script died a horrible death. Autopsy report here: $LOG_FILE${NC}"
+        log_to_file "FATAL" "Script crashed and burned."
     fi
     exit "$exit_code"
 }
@@ -112,19 +112,20 @@ trap cleanup_handler EXIT
 trap 'exit 130' SIGINT SIGTERM
 
 # ==============================================================================
-# 2. Advanced Terminal UI Engine
+# 2. UI / Making things look nice
 # ==============================================================================
 
 print_banner() {
     clear
-    echo -e "${PURPLE}╔═════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${PURPLE}║                                                                 ║${NC}"
-    echo -e "${PURPLE}║                  ${GREEN}🌿 Gigi's Rice Installer 🌿${PURPLE}                     ║${NC}"
-    echo -e "${PURPLE}║                                                                 ║${NC}"
-    echo -e "${PURPLE}║                  ${CYAN}Niri + Noctalia Configuration${PURPLE}                  ║${NC}"
-    echo -e "${PURPLE}║                                                                 ║${NC}"
-    echo -e "${PURPLE}╚═════════════════════════════════════════════════════════════════╝${NC}"
-    echo -e "  ${BOLD}Version:${NC} ${YELLOW}$VERSION${NC} | ${BOLD}Author:${NC} ${YELLOW}$AUTHOR${NC} | ${BOLD}Log:${NC} ${BLUE}$LOG_FILE${NC}"
+    echo -e "${PURPLE}"
+    echo '      ██████╗ ██╗ ██████╗ ██╗███████╗      ██████╗ ██╗ ██████╗███████╗'
+    echo '     ██╔════╝ ██║██╔════╝ ██║██╔════╝      ██╔══██╗██║██╔════╝██╔════╝'
+    echo '     ██║  ███╗██║██║  ███╗██║███████╗█████╗██████╔╝██║██║     █████╗  '
+    echo '     ██║   ██║██║██║   ██║██║╚════██║╚════╝██╔══██╗██║██║     ██╔══╝  '
+    echo '     ╚██████╔╝██║╚██████╔╝██║███████║      ██║  ██║██║╚██████╗███████╗'
+    echo '      ╚═════╝ ╚═╝ ╚═════╝ ╚═╝╚══════╝      ╚═╝  ╚═╝╚═╝ ╚═════╝╚══════╝'
+    echo -e "${NC}"
+    echo -e "  ${BOLD}Version:${NC} ${YELLOW}$VERSION${NC} | ${BOLD}Chef:${NC} ${YELLOW}$AUTHOR${NC} | ${BOLD}Log:${NC} ${BLUE}$LOG_FILE${NC}"
     echo -e "───────────────────────────────────────────────────────────────────\n"
 }
 
@@ -153,7 +154,7 @@ log_step() {
     echo -e "${BLUE}${BOLD}[$CURRENT_STEP/$TOTAL_STEPS] $title${NC}"
     echo -e "${BLUE}${BOLD}───────────────────────────────────────────────────────────────────${NC}"
     render_progress "$pct"
-    log_to_file "STEP" "Started step: $title"
+    log_to_file "STEP" "Now doing: $title"
 }
 
 log_success() { echo -e "  ${GREEN}✔${NC} $1"; log_to_file "SUCCESS" "$1"; }
@@ -162,29 +163,29 @@ log_info()    { echo -e "  ${CYAN}ℹ${NC} $1"; log_to_file "INFO" "$1"; }
 log_warn()    { echo -e "  ${YELLOW}⚠${NC} $1"; log_to_file "WARN" "$1"; }
 
 # ==============================================================================
-# 3. Structural Hardware & Repository Inspection Functions
+# 3. Environment & Sanity Checks
 # ==============================================================================
 
 verify_environment() {
     if [ ! -d "configs" ]; then
-        log_fail "Directory root error. Script must be executed inside the git repository."
+        log_fail "Where are you? Run this script from inside the git repository."
         exit 1
     fi
     if [ ! -f /etc/arch-release ]; then
-        log_fail "Distribution target unsupported. This profile requires Arch Linux."
+        log_fail "No Arch? No rice. We need Arch Linux for this to work."
         exit 1
     fi
 }
 
 probe_network() {
-    log_to_file "NETWORK" "Running network link tests."
+    log_to_file "NETWORK" "Pinging the outside world..."
     if { true > "/dev/tcp/1.1.1.1/53"; } &>/dev/null || \
        { true > "/dev/tcp/8.8.8.8/53"; } &>/dev/null; then
         HAS_INTERNET=true
-        log_to_file "NETWORK" "Internet access available."
+        log_to_file "NETWORK" "We have internet!"
     else
         HAS_INTERNET=false
-        log_to_file "NETWORK" "Internet access unavailable."
+        log_to_file "NETWORK" "You're offline. Some stuff is gonna fail."
     fi
 }
 
@@ -201,7 +202,7 @@ get_discovered_modules() {
     if [ -d "configs" ]; then
         local entry
         for entry in configs/*; do
-            # STRICT GUARD: Ensure we only map subdirectories to avoid files like starship.toml
+            # Make sure we only snag folders, avoid strays like starship.toml
             if [ -d "$entry" ]; then
                 local base_entry="${entry##*/}"
                 local is_known=false
@@ -232,75 +233,75 @@ get_system_aur_helper() {
 }
 
 # ==============================================================================
-# 4. Functional Execution Core Phases
+# 4. The actual heavy lifting
 # ==============================================================================
 
 phase_validate_env() {
-    log_step "Validating Environment"
+    log_step "Checking Window Manager"
     if ! command -v niri &>/dev/null; then
-        log_warn "Niri window manager not found in local system bin paths."
+        log_warn "Niri window manager isn't installed. You sure about this?"
     else
-        log_success "Niri base environment verified."
+        log_success "Niri is here. We are good to go."
     fi
 }
 
 phase_build_noctalia() {
-    log_step "Verifying Noctalia Shell Installation"
+    log_step "Checking for Noctalia Shell"
     if command -v noctalia &>/dev/null; then
-        log_success "Noctalia configuration shell is already built and available."
+        log_success "Noctalia is already chilling on your system."
         ALREADY_PRESENT_PACKAGES+=("noctalia-shell")
         return
     fi
 
-    log_warn "Noctalia shell binary missing. Commencing AUR deployment build..."
-    if $DRY_RUN; then log_info "Dry Run: Skipping Noctalia compilation."; return; fi
+    log_warn "Noctalia shell is missing. Time to bother the AUR..."
+    if $DRY_RUN; then log_info "Dry Run: Skipping the Noctalia build."; return; fi
     if ! $HAS_INTERNET; then
-        log_fail "Network required to compile Noctalia. Aborting environment build."
+        log_fail "No internet? Can't build Noctalia then. Aborting."
         exit 1
     fi
 
     local helper
     helper=$(get_system_aur_helper)
     if [ -z "$helper" ]; then
-        log_fail "No active AUR helper (yay/paru) found. Please install an AUR helper first."
+        log_fail "You don't have yay or paru installed. Fix that first."
         exit 1
     fi
 
-    log_info "Invoking $helper to provision noctalia-shell..."
+    log_info "Telling $helper to go fetch noctalia-shell..."
     if "$helper" -S --needed --noconfirm noctalia-shell 2>>"$LOG_FILE"; then
-        log_success "Successfully deployed Noctalia shell via $helper."
+        log_success "Noctalia installed perfectly."
         INSTALLED_PACKAGES+=("noctalia-shell")
     else
-         log_fail "AUR tracking installation failed for package target: noctalia-shell"
+         log_fail "The AUR hated that. Noctalia install failed."
          exit 1
     fi
 }
 
 phase_system_refresh() {
-    log_step "Updating System"
+    log_step "Updating Your System"
     if $DRY_RUN; then log_info "Dry Run: Skipping system updates."; return; fi
     if ! $HAS_INTERNET; then
-        log_warn "Offline state detected. Skipping pacman mirror sync operations."
+        log_warn "You're offline. Skipping pacman updates."
         return
     fi
 
-    read -rp "  Run system package upgrade via pacman? [Y/n]: " choice
+    read -rp "  Wanna run a quick pacman upgrade first? [Y/n]: " choice
     choice=${choice:-Y}
     if [[ "$choice" =~ ^[Yy]$ ]]; then
-        log_info "Running pacman system upgrade..."
+        log_info "Unleashing pacman..."
         if sudo pacman -Syu --noconfirm; then
-            log_success "System update complete."
+            log_success "System is fresh and clean."
         else
-            log_fail "Pacman synchronization encountered an execution error."
+            log_fail "Pacman tripped over something. Fix your mirrors maybe?"
             exit 1
         fi
     else
-        log_info "System update skipped by user choice."
+        log_info "Living dangerously. Skipping system update."
     fi
 }
 
 phase_inspect_dependencies() {
-    log_step "Checking Installed Programs"
+    log_step "Checking Your Installed Toys"
     local modules
     mapfile -t modules < <(get_discovered_modules)
     
@@ -310,19 +311,19 @@ phase_inspect_dependencies() {
         local target_pkg="${PACKAGE_MAP[$mod]:-"$mod"}"
         
         if command -v "$check_cmd" &>/dev/null; then
-            log_success "Package dependency met: $mod ($target_pkg)"
+            log_success "Found: $mod"
             ALREADY_PRESENT_PACKAGES+=("$target_pkg")
         else
-            log_warn "Package dependency missing: $mod ($target_pkg)"
+            log_warn "Missing: $mod (Needs package: $target_pkg)"
         fi
     done
 }
 
 phase_resolve_dependencies() {
-    log_step "Installing Missing Programs"
-    if $DRY_RUN; then log_info "Dry Run: Skipping application deployment."; return; fi
+    log_step "Installing The Missing Stuff"
+    if $DRY_RUN; then log_info "Dry Run: Not installing anything today."; return; fi
     if ! $HAS_INTERNET; then
-        log_warn "Network connection required to install packages. Skipping package deployment."
+        log_warn "No internet, no packages. Skipping."
         return
     fi
 
@@ -341,16 +342,16 @@ phase_resolve_dependencies() {
     done
 
     if [ ${#missing_pkgs[@]} -eq 0 ]; then
-        log_success "All application dependencies are verified."
+        log_success "You already have everything installed. Nice."
         return
     fi
 
-    echo -e "  The following programs are missing: ${YELLOW}${missing_pkgs[*]}${NC}"
-    read -rp "  Install missing programs? [Y/n]: " choice
+    echo -e "  You're missing these packages: ${YELLOW}${missing_pkgs[*]}${NC}"
+    read -rp "  Install them now? [Y/n]: " choice
     choice=${choice:-Y}
 
     if [[ ! "$choice" =~ ^[Yy]$ ]]; then
-        log_warn "Skipped program installation. Some system components may be non-functional."
+        log_warn "Skipped package installs. Stuff might look broken later."
         return
     fi
 
@@ -359,28 +360,28 @@ phase_resolve_dependencies() {
 
     local pkg
     for pkg in "${missing_pkgs[@]}"; do
-        log_info "Installing package: $pkg"
+        log_info "Grabbin': $pkg"
         if sudo pacman -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
-            log_success "Successfully installed native package: $pkg"
+            log_success "Got it from official repos: $pkg"
             INSTALLED_PACKAGES+=("$pkg")
         else
             if [ -n "$helper" ]; then
-                log_info "Package not found natively. Retrying installation with AUR helper: $helper"
+                log_info "Not in pacman. Let's ask $helper to find it..."
                 if "$helper" -S --needed --noconfirm "$pkg" 2>>"$LOG_FILE"; then
-                    log_success "Successfully installed AUR package: $pkg"
+                    log_success "Got it from AUR: $pkg"
                     INSTALLED_PACKAGES+=("$pkg")
                     continue
                 fi
             fi
-            log_fail "Failed to install required program package: $pkg"
+            log_fail "Could not install $pkg. You might have to do it yourself."
             FAILED_PACKAGES+=("$pkg")
         fi
     done
 }
 
 phase_execute_backup() {
-    log_step "Backing Up Existing Configurations"
-    if $DRY_RUN; then log_info "Dry Run: Bypassing filesystem backup creation."; return; fi
+    log_step "Backing Up Your Old Junk"
+    if $DRY_RUN; then log_info "Dry Run: Not touching your files."; return; fi
 
     local modules
     mapfile -t modules < <(get_discovered_modules)
@@ -394,27 +395,27 @@ phase_execute_backup() {
     done
 
     if [ ${#verified_backups[@]} -eq 0 ]; then
-        log_info "No pre-existing local configurations detected. Skipping backup phase."
+        log_info "No old configs found to backup. Nothing to do here."
         return
     fi
 
     if ! mkdir -p "$BACKUP_DIR" 2>>"$LOG_FILE"; then
-        log_fail "Failed to initialize backup matrix location directory."
+        log_fail "Failed to create the backup folder. That's not great."
         exit 1
     fi
 
     for mod in "${verified_backups[@]}"; do
         if cp -a "$HOME/.config/$mod" "$BACKUP_DIR/" 2>>"$LOG_FILE"; then
-            log_success "Saved backup copy of: ~/.config/$mod"
+            log_success "Stashed your old ~/.config/$mod away safely."
         else
-            log_fail "Failed to copy backup configurations for module component target: $mod"
+            log_fail "Failed to backup $mod. Watch out."
         fi
     done
 }
 
 phase_deploy_configs() {
     local interactive=$1
-    log_step "Installing Configurations"
+    log_step "Deploying The Rice 🍚"
     
     local modules
     mapfile -t modules < <(get_discovered_modules)
@@ -427,14 +428,14 @@ phase_deploy_configs() {
     for mod in "${modules[@]}"; do
         local action=true
         if $interactive; then
-            read -rp "  Install user configuration profile layout for [${mod}]? [Y/n]: " choice
+            read -rp "  Install configs for [${mod}]? [Y/n]: " choice
             choice=${choice:-Y}
             [[ ! "$choice" =~ ^[Yy]$ ]] && action=false
         fi
 
         if $action; then
             if $DRY_RUN; then
-                log_info "Dry Run: Would safe-deploy configurations path profile module: $mod"
+                log_info "Dry Run: Would have installed: $mod"
                 INSTALLED_CONFIGS+=("$mod")
             else
                 local tmp_dest="$HOME/.config/.$mod.tmp.$TIMESTAMP"
@@ -446,25 +447,25 @@ phase_deploy_configs() {
                         rm -rf "$final_dest" 2>>"$LOG_FILE"
                     fi
                     if mv "$tmp_dest" "$final_dest" 2>>"$LOG_FILE"; then
-                        log_success "Installed configuration profile: $mod"
+                        log_success "Riced out: $mod"
                         INSTALLED_CONFIGS+=("$mod")
                     else
-                        log_fail "Atomic move step failed for configuration module: $mod"
+                        log_fail "Failed moving config folder for: $mod"
                         FAILED_CONFIGS+=("$mod")
                     fi
                 else
-                    log_fail "Staging execution step failed for configuration module: $mod"
+                    log_fail "Failed copying configs for: $mod"
                     FAILED_CONFIGS+=("$mod")
                     rm -rf "$tmp_dest"
                 fi
             fi
         else
-            log_warn "Skipped installation profile: $mod"
+            log_warn "Skipped: $mod"
             SKIPPED_CONFIGS+=("$mod")
         fi
     done
 
-    # --- Supplementary Non-XDG Asset Deployments ---
+    # --- Getting the extra fluff (wallpapers, fonts, etc.) ---
     local asset_folders=("wallpapers" "fonts" "themes" "icons" "bin")
     local asset
     for asset in "${asset_folders[@]}"; do
@@ -479,16 +480,16 @@ phase_deploy_configs() {
             esac
             
             if [ -n "$dest" ]; then
-                log_info "Installing auxiliary asset profile: $asset"
+                log_info "Dropping in the extra goodies: $asset"
                 if ! $DRY_RUN; then
                     mkdir -p "$dest" 2>>"$LOG_FILE"
                     if cp -a "$asset"/. "$dest/" 2>>"$LOG_FILE"; then
-                        log_success "Asset deployment complete: $asset -> $dest"
+                        log_success "Moved $asset -> $dest"
                     else
-                        log_fail "Failed to install asset files for: $asset"
+                        log_fail "Failed to copy $asset files over."
                     fi
                 else
-                    log_info "Dry Run: Would deploy additional components from $asset -> $dest"
+                    log_info "Dry Run: Would copy $asset to $dest"
                 fi
             fi
         fi
@@ -496,26 +497,26 @@ phase_deploy_configs() {
 }
 
 # ==============================================================================
-# 5. Dynamic Shell Selector & Non-Blocking Provisioning Engine
+# 5. The Shell Makeover
 # ==============================================================================
 
 phase_install_shell_config() {
-    log_step "Dynamic Shell Configuration"
+    log_step "Terminal Makeover Time"
     
-    echo -e "  ${BOLD}Select your preferred terminal environment profile:${NC}"
-    echo -e "  ${GREEN}[1]${NC} Zsh + Powerlevel10k Setup"
-    echo -e "  ${GREEN}[2]${NC} Fish + Starship Setup"
-    echo -e "  ${YELLOW}[3]${NC} Skip Shell Optimization Phase"
+    echo -e "  ${BOLD}Pick your poison for the shell:${NC}"
+    echo -e "  ${GREEN}[1]${NC} Zsh + Powerlevel10k (The Classic)"
+    echo -e "  ${GREEN}[2]${NC} Fish + Starship (The Modern)"
+    echo -e "  ${YELLOW}[3]${NC} Nah, leave my shell alone"
     echo -e "───────────────────────────────────────────────────────────────────${NC}"
     read -rp "Selection [1-3]: " shell_choice
 
     if [[ "$shell_choice" == "3" ]]; then
-        log_info "Shell dynamic pipeline phase bypassed by user request."
+        log_info "Alright, keeping your shell exactly as it is."
         return
     fi
 
     if $DRY_RUN; then
-        log_info "Dry Run: Skipping shell workspace structural mutation."
+        log_info "Dry Run: Not messing with your shell configs today."
         return
     fi
 
@@ -524,34 +525,31 @@ phase_install_shell_config() {
 
     if [[ "$shell_choice" == "1" ]]; then
         # ======================================================================
-        # ZSH + POWERLEVEL10K PIPELINE
+        # ZSH + POWERLEVEL10K 
         # ======================================================================
-        log_info "Initializing Zsh Ecosystem Sync..."
+        log_info "Setting up Zsh..."
         local zsh_deps=("zsh" "git" "curl")
         local dep
         for dep in "${zsh_deps[@]}"; do
             if ! command -v "$dep" &>/dev/null; then
-                log_info "Provisioning missing core dependency: $dep"
+                log_info "Installing missing thing: $dep"
                 sudo pacman -S --needed --noconfirm "$dep" 2>>"$LOG_FILE" || "$helper" -S --needed --noconfirm "$dep" 2>>"$LOG_FILE"
             fi
         done
 
-        # Oh My Zsh Framework Core Deployment
         if [ ! -d "$HOME/.oh-my-zsh" ]; then
-            log_info "Cloning and building standalone Oh My Zsh framework..."
-            if ! $HAS_INTERNET; then log_fail "Network offline. Cannot fetch OMZ framework."; exit 1; fi
+            log_info "Grabbing Oh My Zsh..."
+            if ! $HAS_INTERNET; then log_fail "No internet. Can't download OMZ."; exit 1; fi
             curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > "$LOG_DIR/omz-install.sh"
             sh "$LOG_DIR/omz-install.sh" --unattended --keep-zshrc >>"$LOG_FILE" 2>&1
         fi
 
-        # Powerlevel10k Prompt Setup
         local p10k_dest="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
         if [ ! -d "$p10k_dest" ]; then
-            log_info "Syncing Powerlevel10k asset tree branches..."
+            log_info "Cloning Powerlevel10k..."
             git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dest" >>"$LOG_FILE" 2>&1
         fi
 
-        # Plugins Mapping Setup
         local plugins=("zsh-autosuggestions" "zsh-syntax-highlighting")
         declare -A urls=(
             ["zsh-autosuggestions"]="https://github.com/zsh-users/zsh-autosuggestions"
@@ -559,109 +557,104 @@ phase_install_shell_config() {
         )
         for pl in "${plugins[@]}"; do
             if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/$pl" ]; then
-                log_info "Cloning custom plugin: $pl"
+                log_info "Cloning plugin: $pl"
                 git clone --depth=1 "${urls[$pl]}" "$HOME/.oh-my-zsh/custom/plugins/$pl" >>"$LOG_FILE" 2>&1
             fi
         done
 
-        # Deploy Zsh Dotfiles from home/ matrix
         local f
         for f in ".zshrc" ".p10k.zsh"; do
             if [ -f "$HOME/$f" ]; then mv "$HOME/$f" "$HOME/$f.backup" 2>>"$LOG_FILE"; fi
             if [ -f "home/$f" ]; then 
                 cp -f "home/$f" "$HOME/$f"
-                log_success "Applied custom file: ~/$f"
+                log_success "Applied: ~/$f"
             fi
         done
 
-        # Non-Blocking Shell Update Execution
         local target_shell
         target_shell=$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")
-        log_info "Updating system shell index target cleanly..."
+        log_info "Changing default shell to Zsh..."
         sudo chsh -s "$target_shell" "$USER" </dev/null >>"$LOG_FILE" 2>&1 || true
 
     elif [[ "$shell_choice" == "2" ]]; then
         # ======================================================================
-        # FISH + STARSHIP PIPELINE
+        # FISH + STARSHIP
         # ======================================================================
-        log_info "Initializing Fish + Starship Ecosystem Sync..."
+        log_info "Setting up Fish + Starship..."
         local fish_deps=("fish" "starship")
         local dep
         for dep in "${fish_deps[@]}"; do
             if ! command -v "$dep" &>/dev/null; then
-                log_info "Provisioning missing core dependency: $dep"
+                log_info "Installing missing thing: $dep"
                 sudo pacman -S --needed --noconfirm "$dep" 2>>"$LOG_FILE" || "$helper" -S --needed --noconfirm "$dep" 2>>"$LOG_FILE"
             fi
         done
 
-        # Safe Atomic Deploy for Fish native structures
         if [ -d "configs/fish" ]; then
-            log_info "Deploying custom Fish sub-configurations matrix..."
+            log_info "Dropping in the Fish configs..."
             rm -rf "$HOME/.config/fish"
             cp -r configs/fish "$HOME/.config/" 2>>"$LOG_FILE"
-            log_success "Applied Fish configuration layout folder."
+            log_success "Fish is ready."
         fi
 
-        # Safe Atomic Deploy for Starship (Located explicitly at configs/starship.toml)
         if [ -f "configs/starship.toml" ]; then
-            log_info "Deploying custom prompt layouts config: starship.toml"
+            log_info "Setting up Starship prompt..."
             cp -f configs/starship.toml "$HOME/.config/starship.toml" 2>>"$LOG_FILE"
-            log_success "Applied Starship configuration mapping layout."
+            log_success "Starship is ready."
         fi
 
-        # Non-Blocking Shell Update Execution
         local target_shell
         target_shell=$(command -v fish 2>/dev/null || echo "/usr/bin/fish")
-        log_info "Updating system shell index target cleanly..."
+        log_info "Changing default shell to Fish..."
         sudo chsh -s "$target_shell" "$USER" </dev/null >>"$LOG_FILE" 2>&1 || true
     else
-        log_fail "Invalid shell setup choice provided."
+        log_fail "That wasn't one of the options..."
         exit 1
     fi
 
-    log_success "Target user environment runtime shell parameters updated."
+    log_success "Shell setup is officially done."
 }
 
 phase_signal_environments() {
-    log_step "Reloading Running Applications"
-    if $DRY_RUN; then log_info "Dry Run: Bypassing operational live reloads."; return; fi
+    log_step "Telling Apps to Refresh"
+    if $DRY_RUN; then log_info "Dry Run: Skipping live app reloads."; return; fi
 
     if pgrep -x "kitty" &>/dev/null; then
-        killall -USR1 kitty 2>/dev/null && log_success "Kitty configuration reload signal dispatched." || true
+        killall -USR1 kitty 2>/dev/null && log_success "Told Kitty to reload." || true
     fi
     if pgrep -x "waybar" &>/dev/null; then
-        killall -SIGUSR2 waybar 2>/dev/null && log_success "Waybar configuration reload signal dispatched." || true
+        killall -SIGUSR2 waybar 2>/dev/null && log_success "Told Waybar to reload." || true
     fi
 }
 
 phase_compile_summary() {
-    log_step "Installation Summary"
+    log_step "How'd We Do?"
     local end_time
     end_time=$(date +%s)
     local elapsed=$((end_time - START_TIME))
     
-    echo -e "  ${BOLD}✓ Installed Packages:${NC}       ${GREEN}${INSTALLED_PACKAGES[*]:-None}${NC}"
-    echo -e "  ${BOLD}✓ Already Met Packages:${NC}    ${CYAN}${ALREADY_PRESENT_PACKAGES[*]:-None}${NC}"
-    echo -e "  ${BOLD}✓ Failed Package Installs:${NC}   ${RED}${FAILED_PACKAGES[*]:-None}${NC}"
-    echo -e "  ${BOLD}✓ Installed Configs:${NC}        ${GREEN}${INSTALLED_CONFIGS[*]:-None}${NC}"
-    echo -e "  ${BOLD}✓ Skipped Configs:${NC}          ${YELLOW}${SKIPPED_CONFIGS[*]:-None}${NC}"
-    echo -e "  ${BOLD}✓ Failed Configs:${NC}           ${RED}${FAILED_CONFIGS[*]:-None}${NC}"
+    echo -e "  ${BOLD}✓ We installed:${NC}        ${GREEN}${INSTALLED_PACKAGES[*]:-Nothing}${NC}"
+    echo -e "  ${BOLD}✓ You already had:${NC}     ${CYAN}${ALREADY_PRESENT_PACKAGES[*]:-Nothing}${NC}"
+    echo -e "  ${BOLD}✓ Failed Installs:${NC}     ${RED}${FAILED_PACKAGES[*]:-None}${NC}"
+    echo -e "  ${BOLD}✓ Riced configs:${NC}       ${GREEN}${INSTALLED_CONFIGS[*]:-None}${NC}"
+    echo -e "  ${BOLD}✓ Skipped configs:${NC}     ${YELLOW}${SKIPPED_CONFIGS[*]:-None}${NC}"
+    echo -e "  ${BOLD}✓ Broken configs:${NC}      ${RED}${FAILED_CONFIGS[*]:-None}${NC}"
     
     if [ -d "$BACKUP_DIR" ]; then
-        echo -e "  ${BOLD}✓ Backup Matrix Root:${NC}       ${PURPLE}$BACKUP_DIR${NC}"
+        echo -e "  ${BOLD}✓ Your old stuff is at:${NC} ${PURPLE}$BACKUP_DIR${NC}"
     fi
-    echo -e "  ${BOLD}✓ Diagnostic Log Location:${NC}  ${BLUE}$LOG_FILE${NC}"
-    echo -e "  ${BOLD}✓ Run Time Processing:${NC}      ${YELLOW}$elapsed seconds${NC}"
+    echo -e "  ${BOLD}✓ Error logs are here:${NC}  ${BLUE}$LOG_FILE${NC}"
+    echo -e "  ${BOLD}✓ Time wasted:${NC}          ${YELLOW}$elapsed seconds${NC}"
     echo -e "${BLUE}───────────────────────────────────────────────────────────────────${NC}"
 }
 
 # ==============================================================================
-# 6. Backup Restore Infrastructure Management
+# 6. Oh no, fix it (Backup/Restore)
 # ==============================================================================
 
 execute_restore_operation() {
     TOTAL_STEPS=2
-    log_step "Restoring System Backups"
+    log_step "Emergency Rollback Mode"
     
     local backups=()
     if [ -d "$HOME" ]; then
@@ -674,22 +667,22 @@ execute_restore_operation() {
     fi
 
     if [ ${#backups[@]} -eq 0 ]; then
-        log_fail "No previous configurations backup archives found."
+        log_fail "Uh oh. I didn't find any backups."
         return
     fi
 
-    echo -e "\n  ${BOLD}Available Backups:${NC}"
+    echo -e "\n  ${BOLD}Here's what you can restore:${NC}"
     local i
     for i in "${!backups[@]}"; do
         echo -e "  ${GREEN}[$((i+1))]${NC} $(basename "${backups[$i]}")"
     done
-    echo -e "  ${RED}[c]${NC} Cancel"
+    echo -e "  ${RED}[c]${NC} Changed my mind, cancel."
     echo -e "${BLUE}───────────────────────────────────────────────────────────────────${NC}"
     
-    read -rp "Select a backup archive index to restore: " choice
+    read -rp "Which backup do you want back? " choice
     if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -le "${#backups[@]}" ] && [ "$choice" -gt 0 ]; then
         local target_dir="${backups[$((choice - 1))]}"
-        log_info "Restoring configuration from: $target_dir"
+        log_info "Putting everything back from: $target_dir"
         
         if [ ! -d "$HOME/.config" ]; then
             mkdir -p "$HOME/.config"
@@ -701,20 +694,20 @@ execute_restore_operation() {
                 local base_name="${item##*/}"
                 rm -rf "$HOME/.config/$base_name" 2>>"$LOG_FILE"
                 if cp -a "$item" "$HOME/.config/" 2>>"$LOG_FILE"; then
-                    log_success "Restored: ~/.config/$base_name"
+                    log_success "Saved your bacon on: ~/.config/$base_name"
                 else
-                    log_fail "Failed to restore module: $base_name"
+                    log_fail "Failed to bring back: $base_name"
                 fi
             fi
         done
-        log_success "System rollback operations completed."
+        log_success "Rollback finished. Hopefully things work again."
     else
-        log_info "Rollback procedures canceled."
+        log_info "Aborting. Leaving things as they are."
     fi
 }
 
 # ==============================================================================
-# 7. Global Operational Entry Execution Orchestrator
+# 7. The main brain
 # ==============================================================================
 
 run_orchestrated_installer() {
@@ -731,10 +724,10 @@ run_orchestrated_installer() {
     phase_compile_summary
     
     echo -e "\n${GREEN}═══════════════════════════════════════════════════════════════════${NC}"
-    echo -e "${GREEN}${BOLD}                    Installation Complete!                         ${NC}"
+    echo -e "${GREEN}${BOLD}                   All Done! The Rice is Served.                   ${NC}"
     echo -e "${GREEN}                                                                   ${NC}"
-    echo -e "${GREEN}         Please log out and log back in to reload your profile.    ${NC}"
-    echo -e "${GREEN}                    Enjoy Gigi's Rice 🌿                            ${NC}"
+    echo -e "${GREEN}         Log out and log back in to see the magic happen.          ${NC}"
+    echo -e "${GREEN}                    Enjoy Gigi's Rice 🌿                           ${NC}"
     echo -e "${GREEN}═══════════════════════════════════════════════════════════════════${NC}\n"
 }
 
@@ -743,12 +736,12 @@ main() {
     probe_network
     print_banner
 
-    echo -e "  ${BOLD}Select an action to proceed:${NC}"
-    echo -e "  ${GREEN}[1]${NC} Full Auto-Install"
-    echo -e "  ${GREEN}[2]${NC} Install Selected Configs (Interactive Mode)"
-    echo -e "  ${YELLOW}[3]${NC} Restore Backup"
-    echo -e "  ${CYAN}[4]${NC} Dry Run"
-    echo -e "  ${RED}[5]${NC} Exit"
+    echo -e "  ${BOLD}What are we doing today?${NC}"
+    echo -e "  ${GREEN}[1]${NC} Just do it (Full Auto-Install)"
+    echo -e "  ${GREEN}[2]${NC} Let me pick and choose (Interactive Mode)"
+    echo -e "  ${YELLOW}[3]${NC} Go back! (Restore Backup)"
+    echo -e "  ${CYAN}[4]${NC} Show me what you'd do (Dry Run)"
+    echo -e "  ${RED}[5]${NC} Get me out of here (Exit)"
     echo -e "───────────────────────────────────────────────────────────────────${NC}"
     read -rp "Selection: " menu_choice
 
@@ -766,15 +759,15 @@ main() {
             ;;
         4)
             DRY_RUN=true
-            log_warn "Dry Run Simulation Active. No modifications will be made to your system."
+            log_warn "Dry run active. Look, don't touch. We won't actually break anything."
             run_orchestrated_installer false
             ;;
         5)
-            echo -e "\nExiting installation workspace. Have an excellent day! 🌿"
+            echo -e "\nPeace out! 🌿"
             exit 0
             ;;
         *)
-            log_fail "Invalid menu choice selected."
+            log_fail "I Don't Know What You Did. Quitting."
             exit 1
             ;;
     esac
