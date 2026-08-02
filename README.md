@@ -1,3 +1,28 @@
+> [!WARNING]
+>
+> ## 📦 This repository has been archived
+>
+> **Gigi's Rice is no longer actively maintained.**
+>
+> I've moved to **[🌙 Noctara-dots](https://github.com/deadduck-09/Noctara-Dots)**, a complete rewrite built around **Noctalia v5** with support for both **Niri** and **Hyprland**.
+>
+> ### Why the new repository?
+>
+> - 🌙 Updated for Noctalia v5
+> - 🪟 Supports both Niri & Hyprland
+> - 🚀 Improved installer
+> - 🧩 More modular configuration
+> - 🎨 Better theming and consistency
+> - ⚡ Actively maintained
+>
+> **Can I still use this repository?**
+>
+> Absolutely! Everything here remains fully usable if you're running **Noctalia v4**, or if you'd like to reuse individual application configurations. This repository will remain available as an archive, but future development will happen exclusively in **Noctara-dots**.
+>
+> Thanks to everyone who starred, forked, contributed, or used these dotfiles. ❤️
+
+---
+
 <div align="center">
 
 # 🌿 Gigi's Rice
@@ -11,6 +36,8 @@ A modern, minimal and smooth **Niri + Noctalia** desktop rice for **Arch Linux**
 ![License](https://img.shields.io/github/license/deadduck-09/gigis-rice)
 ![Stars](https://img.shields.io/github/stars/deadduck-09/gigis-rice?style=social)
 ![Installer](https://img.shields.io/badge/Installer-Included-4CAF50)
+![Status](https://img.shields.io/badge/status-archived-red)
+![Successor](https://img.shields.io/badge/successor-Noctara--dots-purple)
 
 </div>
 
@@ -39,9 +66,8 @@ Every configuration included here is the one I personally use.
 >
 > It may **not work correctly with Noctalia v5 or newer**.
 >
-> This rice depends on **Noctalia plugins**, and plugin support is currently unavailable in the latest v5 release. Because of this, the repository currently targets the latest stable v4 release.
->
-> Once plugin support is available in v5, this repository will be updated accordingly.
+> This repository will remain on Noctalia v4 and will not receive future updates.
+> Future development continues in Noctara-dots.
 
 ---
 
